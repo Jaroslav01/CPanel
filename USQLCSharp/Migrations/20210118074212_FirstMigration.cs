@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace USQLCSharp.Migrations
 {
-    public partial class First : Migration
+    public partial class FirstMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,12 +10,12 @@ namespace USQLCSharp.Migrations
                 name: "People",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Birthsday = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    Password = table.Column<string>(nullable: true),
+                    Birthsday = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -27,11 +26,11 @@ namespace USQLCSharp.Migrations
                 name: "Contacts",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PersonId = table.Column<int>(type: "int", nullable: true)
+                    PhoneNumber = table.Column<string>(nullable: true),
+                    EmailAddress = table.Column<string>(nullable: true),
+                    PersonId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -48,13 +47,13 @@ namespace USQLCSharp.Migrations
                 name: "Devices",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Topic = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Data = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    State = table.Column<bool>(type: "bit", nullable: false),
-                    PersonId = table.Column<int>(type: "int", nullable: true)
+                    Name = table.Column<string>(nullable: true),
+                    Topic = table.Column<string>(nullable: true),
+                    Data = table.Column<string>(nullable: true),
+                    State = table.Column<bool>(nullable: false),
+                    PersonId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -71,12 +70,12 @@ namespace USQLCSharp.Migrations
                 name: "PersonStates",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SubmitEmailAddress = table.Column<bool>(type: "bit", nullable: false),
-                    SubmitPhoneNumber = table.Column<bool>(type: "bit", nullable: false),
-                    Admittance = table.Column<int>(type: "int", nullable: false),
-                    PersonId = table.Column<int>(type: "int", nullable: true)
+                    SubmitEmailAddress = table.Column<bool>(nullable: false),
+                    SubmitPhoneNumber = table.Column<bool>(nullable: false),
+                    Admittance = table.Column<int>(nullable: false),
+                    PersonId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {

@@ -13,7 +13,7 @@ namespace USQLCSharp.Models
 
         public string Password { get; set; }
 
-        public DateTime Birthsday { get; set; }
+        public string Birthsday { get; set; }
 
         public List<PersonState> PersonStates { get; set; } = new List<PersonState>();
 

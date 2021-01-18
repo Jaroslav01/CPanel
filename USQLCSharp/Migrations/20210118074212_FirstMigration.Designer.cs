@@ -10,23 +10,23 @@ using USQLCSharp.DataAccess;
 namespace USQLCSharp.Migrations
 {
     [DbContext(typeof(PeopleContext))]
-    [Migration("20210117213906_First")]
-    partial class First
+    [Migration("20210118074212_FirstMigration")]
+    partial class FirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
+                .HasAnnotation("ProductVersion", "3.1.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.2");
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("USQLCSharp.Models.Contact", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("EmailAddress")
                         .HasColumnType("nvarchar(max)");
@@ -49,7 +49,7 @@ namespace USQLCSharp.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Data")
                         .HasColumnType("nvarchar(max)");
@@ -78,10 +78,10 @@ namespace USQLCSharp.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("Birthsday")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Birthsday")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
@@ -102,7 +102,7 @@ namespace USQLCSharp.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("Admittance")
                         .HasColumnType("int");
@@ -142,15 +142,6 @@ namespace USQLCSharp.Migrations
                     b.HasOne("USQLCSharp.Models.Person", null)
                         .WithMany("PersonStates")
                         .HasForeignKey("PersonId");
-                });
-
-            modelBuilder.Entity("USQLCSharp.Models.Person", b =>
-                {
-                    b.HasOne("Contacts");
-
-                    b.HasOne("Devices");
-
-                    b.HasOne("PersonStates");
                 });
 #pragma warning restore 612, 618
         }
