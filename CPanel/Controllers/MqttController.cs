@@ -51,11 +51,11 @@ namespace CPanel.Controllers
                 case MqttClientSubscribeResultCode.GrantedQoS1:
                 case MqttClientSubscribeResultCode.GrantedQoS2:
                     IMqttClient mqttClient = Client.UseApplicationMessageReceivedHandler(me => { var msg = me.ApplicationMessage; });
-                    return Enumerable.Range(1, Client.Options.WillMessage.Payload.Length).Select(index => new Mqtt
+                    return Enumerable.Range(1, 1).Select(index => new Mqtt
                     {
                         Msg = Client.Options.WillMessage.Topic,
                         Data = Encoding.UTF8.GetString(Client.Options.WillMessage.Payload)
-                    });
+                    }).ToArray();
             
                 default:
                     throw new Exception(result.ResultCode.ToString());
