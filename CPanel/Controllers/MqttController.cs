@@ -13,7 +13,9 @@ using System.Threading.Tasks;
 
 namespace CPanel.Controllers
 {
-    public class MqttController : Controller
+    [ApiController]
+    [Route("[controller]")]
+    public class MqttController : ControllerBase
     {
 
         public IMqttClient Client { get; private set; }
@@ -31,32 +33,54 @@ namespace CPanel.Controllers
 
             Auth = await client.ConnectAsync(options);
         }
-
-        public async Task Send(string topic, string data)
+        [HttpGet("{id}")]
+        public async Task Send(int id)
         {
-            await Client.PublishAsync(topic, data);
+            await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
+            await Client.PublishAsync("yaroslav/Kitchen/output2", $"{id}");
+        }
+
+
+
+
+
+
+
+
+
+        public IEnumerable<Mqtt> Senddata(string topic, string data)
+        {
+            return Enumerable.Range(1, 5).Select(index => new Mqtt
+            {
+                Topic = topic,
+                Data = data
+            }).ToArray();
         }
         [HttpGet]
-        public async Task<IEnumerable<Mqtt>> Subscribe(string topic)
+        public async Task<Array> Subscribe()
         {
+            Array A = Senddata("yaroslav/Kitchen/output2", "Empty").ToArray();
+            await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
 
             MqttClientSubscribeResultItem result = (await Client.SubscribeAsync(
                         new TopicFilterBuilder()
-                        .WithTopic(topic)
+                        .WithTopic("yaroslav/Kitchen/output2")
                         .Build()
                     )).Items[0];
             switch (result.ResultCode)
             {
+
                 case MqttClientSubscribeResultCode.GrantedQoS0:
                 case MqttClientSubscribeResultCode.GrantedQoS1:
                 case MqttClientSubscribeResultCode.GrantedQoS2:
-                    IMqttClient mqttClient = Client.UseApplicationMessageReceivedHandler(me => { var msg = me.ApplicationMessage; });
-                    return Enumerable.Range(1, 1).Select(index => new Mqtt
+                    Client.UseApplicationMessageReceivedHandler(me =>
                     {
-                        Msg = Client.Options.WillMessage.Topic,
-                        Data = Encoding.UTF8.GetString(Client.Options.WillMessage.Payload)
-                    }).ToArray();
-            
+                        var msg = me.ApplicationMessage;
+                        var data = Encoding.UTF8.GetString(msg.Payload);
+                        A = Senddata(msg.Topic, data).ToArray();
+                    });
+                    return A; 
+
                 default:
                     throw new Exception(result.ResultCode.ToString());
             }

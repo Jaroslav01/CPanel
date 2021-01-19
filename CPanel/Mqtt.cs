@@ -12,6 +12,6 @@ namespace CPanel
         public string Topic { get; set; }
 
         public string Data { get; set; }
-        public object Msg { get; internal set; }
+
     }
 }
