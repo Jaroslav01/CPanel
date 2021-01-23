@@ -6,10 +6,11 @@ using MQTTnet.Client.Options;
 using MQTTnet.Client.Subscribing;
 using MQTTnet.Formatter;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using USQLCSharp.DataAccess;
+using USQLCSharp.Models;
+using System.Linq;
 
 namespace CPanel.Controllers
 {
@@ -17,10 +18,8 @@ namespace CPanel.Controllers
     [Route("[controller]")]
     public class MqttController : ControllerBase
     {
-
         public IMqttClient Client { get; private set; }
         public MqttClientAuthenticateResult Auth { get; private set; }
-
         public async Task Connect(string ip, string port, string login, string password)
         {
             IMqttClient client = new MqttFactory().CreateMqttClient();
@@ -30,57 +29,48 @@ namespace CPanel.Controllers
                 .WithCredentials(login, password)
                 .WithProtocolVersion(MqttProtocolVersion.V311)
                 .Build();
-
             Auth = await client.ConnectAsync(options);
         }
         [HttpGet("{id}")]
-        public async Task Send(int id)
+        public async Task Send(string id, string topic)
         {
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
-            await Client.PublishAsync("yaroslav/Kitchen/output2", $"{id}");
+            await Client.PublishAsync("yaroslav/Kitchen/output0", id);
         }
-
-
-
-
-
-
-
-
-
-        public IEnumerable<Mqtt> Senddata(string topic, string data)
+        [HttpGet("sub")]
+        public async Task Subscribe()
         {
-            return Enumerable.Range(1, 5).Select(index => new Mqtt
-            {
-                Topic = topic,
-                Data = data
-            }).ToArray();
-        }
-        [HttpGet]
-        public async Task<Array> Subscribe()
-        {
-            Array A = Senddata("yaroslav/Kitchen/output2", "Empty").ToArray();
+
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
-
             MqttClientSubscribeResultItem result = (await Client.SubscribeAsync(
-                        new TopicFilterBuilder()
-                        .WithTopic("yaroslav/Kitchen/output2")
-                        .Build()
-                    )).Items[0];
+                         new TopicFilterBuilder()
+                         .WithTopic("yaroslav/Kitchen/output0")
+                         .Build()
+                     )).Items[0];
             switch (result.ResultCode)
             {
-
                 case MqttClientSubscribeResultCode.GrantedQoS0:
                 case MqttClientSubscribeResultCode.GrantedQoS1:
                 case MqttClientSubscribeResultCode.GrantedQoS2:
                     Client.UseApplicationMessageReceivedHandler(me =>
                     {
                         var msg = me.ApplicationMessage;
-                        var data = Encoding.UTF8.GetString(msg.Payload);
-                        A = Senddata(msg.Topic, data).ToArray();
+                        using var db = new PeopleContext();
+                        var item = db.Devices.FirstOrDefault(x => x.Topic == msg.Topic);
+                        if (item != null)
+                        {
+                            item.Data = Encoding.UTF8.GetString(msg.Payload);
+                        }
+                        else
+                        {
+                            var device = new Device();
+                            device.Data = Encoding.UTF8.GetString(msg.Payload);
+                            device.Topic = msg.Topic;
+                            db.Add(device);
+                        }
+                        db.SaveChanges();
                     });
-                    return A; 
-
+                    break;
                 default:
                     throw new Exception(result.ResultCode.ToString());
             }

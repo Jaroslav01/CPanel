@@ -1,0 +1,13 @@
+body {
+}
+.ControlBox {
+  background-color: #494c8e;
+  color: white;
+  bottom: 20px;
+  position: inherit;
+  left: 25%;
+  width: 50%;
+  border-radius: 25px;
+  border-style: none;
+}
+

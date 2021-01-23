@@ -1,24 +1,24 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-counter-component',
-  templateUrl: './counter.component.html'
+  selector: 'panel-component',
+  templateUrl: './panel.component.html'
 })
-export class CounterComponent {
+export class PanelComponent {
   public currentCount = 0;
   public i = 1;
 
 
-
-  public incrementCounter() {
+  
+  public OnOff() {
     this.currentCount++;
     this.i = 1;
     if (this.currentCount % 2 == 0) { this.i = 0; }
 
-    else { this.i = 1;}
-      
+    else { this.i = 1; }
 
-    var request = new Request('https://localhost:44333/Mqtt/'+this.i);
+
+    var request = new Request('https://localhost:44333/Mqtt/' + this.i);
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {

@@ -9,7 +9,7 @@
         public string Topic { get; set; }
 
         public string Data { get; set; }
-
+        
         public bool State { get; set; }
     }
 }
