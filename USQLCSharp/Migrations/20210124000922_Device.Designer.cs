@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using USQLCSharp.DataAccess;
 
 namespace USQLCSharp.Migrations
 {
     [DbContext(typeof(PeopleContext))]
-    partial class PeopleContextModelSnapshot : ModelSnapshot
+    [Migration("20210124000922_Device")]
+    partial class Device
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,6 +51,9 @@ namespace USQLCSharp.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Data")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Ip")
                         .HasColumnType("nvarchar(max)");
 
@@ -78,32 +83,6 @@ namespace USQLCSharp.Migrations
                     b.HasIndex("PersonId");
 
                     b.ToTable("Devices");
-                });
-
-            modelBuilder.Entity("USQLCSharp.Models.Parameter", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Data")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("DeviceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Topic")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DeviceId");
-
-                    b.ToTable("Parameters");
                 });
 
             modelBuilder.Entity("USQLCSharp.Models.Person", b =>
@@ -168,13 +147,6 @@ namespace USQLCSharp.Migrations
                     b.HasOne("USQLCSharp.Models.Person", null)
                         .WithMany("Devices")
                         .HasForeignKey("PersonId");
-                });
-
-            modelBuilder.Entity("USQLCSharp.Models.Parameter", b =>
-                {
-                    b.HasOne("USQLCSharp.Models.Device", null)
-                        .WithMany("Parameters")
-                        .HasForeignKey("DeviceId");
                 });
 
             modelBuilder.Entity("USQLCSharp.Models.PersonState", b =>

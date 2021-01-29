@@ -11,6 +11,7 @@ namespace USQLCSharp.DataAccess
         public DbSet<PersonState> PersonStates { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Device> Devices { get; set; }
+        public DbSet<Parameter> Parameters { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
         { 
             optionsBuilder.UseSqlServer("Server=DESKTOP-611SA6B;Database=CPanel2d;Trusted_Connection=True;"); 

@@ -11,9 +11,11 @@ using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
 using System.Linq;
-
+using System.Collections.Generic;
+using System.Collections;
 namespace CPanel.Controllers
 {
+
     [ApiController]
     [Route("[controller]")]
     public class MqttController : ControllerBase
@@ -32,22 +34,21 @@ namespace CPanel.Controllers
             Auth = await client.ConnectAsync(options);
         }
         [HttpGet("{id}")]
-        public async Task Send(string id, string topic)
+        public async Task Send(string id)
         {
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
-            await Client.PublishAsync("yaroslav/Kitchen/output0", id);
+            await Client.PublishAsync("yaroslav/Kitchen/output2", id);
         }
-        [HttpGet("sub")]
-        public async Task Subscribe()
+        [HttpGet("data")]    
+        public async Task Data()
         {
-
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
-            MqttClientSubscribeResultItem result = (await Client.SubscribeAsync(
+            var result = (await Client.SubscribeAsync(
                          new TopicFilterBuilder()
-                         .WithTopic("yaroslav/Kitchen/output0")
+                         .WithTopic($"yaroslav/TableLamp/output5")
                          .Build()
-                     )).Items[0];
-            switch (result.ResultCode)
+                     )).Items.ToList();
+            switch (result[0].ResultCode)
             {
                 case MqttClientSubscribeResultCode.GrantedQoS0:
                 case MqttClientSubscribeResultCode.GrantedQoS1:
@@ -56,24 +57,38 @@ namespace CPanel.Controllers
                     {
                         var msg = me.ApplicationMessage;
                         using var db = new PeopleContext();
-                        var item = db.Devices.FirstOrDefault(x => x.Topic == msg.Topic);
+                        var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
                         if (item != null)
                         {
                             item.Data = Encoding.UTF8.GetString(msg.Payload);
                         }
                         else
                         {
-                            var device = new Device();
+                            var device = new Parameter();
+                            device.Name = "Lamp";
                             device.Data = Encoding.UTF8.GetString(msg.Payload);
                             device.Topic = msg.Topic;
                             db.Add(device);
                         }
                         db.SaveChanges();
+                         
                     });
                     break;
                 default:
-                    throw new Exception(result.ResultCode.ToString());
+                    throw new Exception(result[0].ResultCode.ToString());
             }
+        }
+        [HttpGet("leng")]
+        public List<Parameter> get(int id)
+        {
+            using var db = new PeopleContext();
+            return db.Parameters.Select(x => new Parameter
+            {
+                Id = x.Id,
+                Topic = x.Topic,
+                Data = x.Data,
+                Name = x.Name
+            }).ToList();
         }
     }
 }

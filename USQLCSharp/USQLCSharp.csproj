@@ -198,9 +198,18 @@
     <Compile Include="Migrations\20210118074212_FirstMigration.designer.cs">
       <DependentUpon>20210118074212_FirstMigration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20210124000922_Device.cs" />
+    <Compile Include="Migrations\20210124000922_Device.designer.cs">
+      <DependentUpon>20210124000922_Device.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20210124220608_DeviceRefactored.cs" />
+    <Compile Include="Migrations\20210124220608_DeviceRefactored.designer.cs">
+      <DependentUpon>20210124220608_DeviceRefactored.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\PeopleContextModelSnapshot.cs" />
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\Device.cs" />
+    <Compile Include="Models\Parameter.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\PersonState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
