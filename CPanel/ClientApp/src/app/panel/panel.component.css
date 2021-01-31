@@ -1,13 +1,22 @@
-body {
-}
 .ControlBox {
-  background-color: #494c8e;
+  background-color: rgba(0,0,0,.075);
+  width: 250px;
+  height: 300px;
+  border-radius: 25px;
+  text-align: center;
+  font-size: 25px;
+  position: absolute;
+  padding: 15px;
+  padding-top: 20px;
+}
+
+.ButtonOn {
+
+  background-color: black;
   color: white;
   bottom: 20px;
   position: inherit;
-  left: 25%;
-  width: 50%;
+  left: 30%;
+  width: 40%;
   border-radius: 25px;
-  border-style: none;
 }
-

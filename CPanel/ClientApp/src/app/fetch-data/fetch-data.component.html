@@ -1,24 +1,53 @@
-<h1 id="tableLabel">Weather forecast</h1>
+<h1 id="tableLabel">Prameters</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-<p *ngIf="!forecasts"><em>Loading...</em></p>
+<p *ngIf="!response"><em>Loading...</em></p>
 
-<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="forecasts">
+<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="response">
   <thead>
     <tr>
-      <th>Date</th>
-      <th>Temp. (C)</th>
-      <th>Temp. (F)</th>
-      <th>Summary</th>
+      <th>Id</th>
+      <th>DeviseId</th>
+      <th>Name</th>
+      <th>Topic</th>
+      <th>Data</th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let forecast of forecasts">
-      <td>{{ forecast.date }}</td>
-      <td>{{ forecast.temperatureC }}</td>
-      <td>{{ forecast.temperatureF }}</td>
-      <td>{{ forecast.summary }}</td>
+    <tr *ngFor="let responses of response">
+      <td>{{ responses.id }}</td>
+      <td>{{ responses.deviseId }}</td>
+      <td>{{ responses.name }}</td>
+      <td>{{ responses.topic }}</td>
+      <td>{{ responses.data }}</td>
     </tr>
   </tbody>
 </table>
+
+
+
+<div *ngFor="let responses of response" class="ControlBox" style="
+    background-color: rgba(0,0,0,.075);
+    width: 250px;
+    height: 300px;
+    border-radius: 25px;
+    text-align: center;
+    font-size: 25px;
+    position: absolute;
+    padding: 15px;
+    padding-top: 20px;
+">
+  {{ responses.name }}
+  <button class="buttonON" style="
+    background-color: black;
+    color: white;
+    bottom: 20px;
+    position: inherit;
+    left: 30%;
+    width: 40%;
+    border-radius: 25px;
+" (click)="OnOff()">
+    ON
+  </button>
+</div>

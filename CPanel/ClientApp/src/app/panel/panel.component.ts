@@ -1,29 +1,39 @@
-import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, Inject } from '@angular/core';
 
 @Component({
   selector: 'panel-component',
   templateUrl: './panel.component.html'
 })
 export class PanelComponent {
+  public response: Parameter[];
+  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+    http.get<Parameter[]>(baseUrl + 'mqtt/GetParameters').subscribe(result => {
+      this.response = result;
+    }, error => console.error(error));
+  }
+
   public currentCount = 0;
   public i = 1;
-
-
-  
-  public OnOff() {
+  public topic: string;
+  public OnOff2(topic: string) {
     this.currentCount++;
     this.i = 1;
     if (this.currentCount % 2 == 0) { this.i = 0; }
-
     else { this.i = 1; }
-
-
-    var request = new Request('https://localhost:44333/Mqtt/' + this.i);
+    var request = new Request("https://localhost:44333/mqtt/set?topic="+topic+"?value=0");
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {
       console.log(text.substring(0, 30));
     });
-
   }
+}
+
+interface Parameter {
+  id: number;
+  deviseId: number;
+  name: string;
+  topic: string;
+  data: string;
 }

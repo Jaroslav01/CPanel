@@ -14,3 +14,27 @@ code {
   background-color: #1b6ec2;
   border-color: #1861ac;
 }
+
+.ControlBox {
+  margin-left: 26px;
+  display: inline-block;
+  background-color: rgb(242 242 242);
+  width: 250px;
+  border: 2px solid;
+  height: 300px;
+  border-radius: 25px;
+  text-align: center;
+  font-size: 25px;
+  position: relative;
+  /* left: 25px; */
+  padding-top: 20px;
+}
+.buttonON {
+  background-color: #371ed8;
+  color: white;
+  bottom: 20px;
+  position: absolute;
+  left: 30%;
+  width: 40%;
+  border-radius: 25px;
+}

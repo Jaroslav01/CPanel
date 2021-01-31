@@ -206,6 +206,10 @@
     <Compile Include="Migrations\20210124220608_DeviceRefactored.designer.cs">
       <DependentUpon>20210124220608_DeviceRefactored.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20210129202151_Devise.cs" />
+    <Compile Include="Migrations\20210129202151_Devise.designer.cs">
+      <DependentUpon>20210129202151_Devise.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\PeopleContextModelSnapshot.cs" />
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\Device.cs" />

@@ -4,6 +4,8 @@
     {
         public int Id { get; set; }
 
+        public int DeviseId { get; set; }
+
         public string Name { get; set; }
 
         public string Topic { get; set; }
