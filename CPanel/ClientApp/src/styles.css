@@ -16,7 +16,7 @@ code {
 }
 
 .ControlBox {
-  margin-left: 26px;
+  margin: 26px;
   display: inline-block;
   background-color: rgb(242 242 242);
   width: 250px;
@@ -30,11 +30,12 @@ code {
   padding-top: 20px;
 }
 .buttonON {
-  background-color: #371ed8;
+  background-color: #b73a3a;
   color: white;
   bottom: 20px;
   position: absolute;
-  left: 30%;
-  width: 40%;
+  left: 25%;
+  width: 50%;
+  border: none;
   border-radius: 25px;
 }

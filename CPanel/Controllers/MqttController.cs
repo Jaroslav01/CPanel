@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.Collections;
 namespace CPanel.Controllers
 {
-
     [ApiController]
     [Route("[controller]")]
     public class MqttController : ControllerBase
@@ -38,15 +37,16 @@ namespace CPanel.Controllers
         {
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
             await Client.PublishAsync(topic, value);
-        }
-        
+        }//https://localhost:44333/mqtt/set?topic=yaroslav/Kitchen/output2&value=1
+
         [HttpGet("update")]
         public async Task Update(string topic, string name)
         {
+            
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
             var result = (await Client.SubscribeAsync(
                          new TopicFilterBuilder()
-                         .WithTopic(topic)
+                         .WithTopic($"{topic}")
                          .Build()
                      )).Items.ToList();
             switch (result[0].ResultCode)
@@ -56,22 +56,21 @@ namespace CPanel.Controllers
                 case MqttClientSubscribeResultCode.GrantedQoS2:
                     Client.UseApplicationMessageReceivedHandler(me =>
                     {
-                        using var db = new PeopleContext();
                         var msg = me.ApplicationMessage;
+                        using var db = new PeopleContext();
                         var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
                         if (item != null)
                         {
+                            if (name != item.Name) item.Name = name;
                             item.Data = Encoding.UTF8.GetString(msg.Payload);
                         }
                         else
                         {
-                            var parameter = new Parameter
-                            {
-                                Name = name,
-                                Data = Encoding.UTF8.GetString(msg.Payload),
-                                Topic = msg.Topic
-                            };
-                            db.Add(parameter);
+                            var device = new Parameter();
+                            device.Name = name;
+                            device.Data = Encoding.UTF8.GetString(msg.Payload);
+                            device.Topic = msg.Topic;
+                            db.Add(device);
                         }
                         db.SaveChanges();
                     });
@@ -114,12 +113,13 @@ namespace CPanel.Controllers
         {
             using var db = new PeopleContext();
             var lis = db.Parameters.Select(x => new Parameter
-            { 
+            {
+                Name = x.Name,
                 Topic = x.Topic
             }).ToList();
             for (int i = 0; i < lis.Count; i++)
             {
-                await Update(lis[i].Topic, "");
+                await Update(lis[i].Topic, lis[i].Topic);
             }
         }
         /* [HttpGet("api")]
