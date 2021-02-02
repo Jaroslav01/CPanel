@@ -40,7 +40,7 @@ namespace CPanel.Controllers
         }//https://localhost:44333/mqtt/set?topic=yaroslav/Kitchen/output2&value=1
 
         [HttpGet("update")]
-        public async Task Update(string topic, string name)
+        public async Task Update(string topic, string? name = "Name")
         {
             
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
@@ -59,6 +59,7 @@ namespace CPanel.Controllers
                         var msg = me.ApplicationMessage;
                         using var db = new PeopleContext();
                         var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
+                        if (name == "name") name = item.Name;
                         if (item != null)
                         {
                             if (name != item.Name) item.Name = name;
@@ -114,12 +115,11 @@ namespace CPanel.Controllers
             using var db = new PeopleContext();
             var lis = db.Parameters.Select(x => new Parameter
             {
-                Name = x.Name,
                 Topic = x.Topic
             }).ToList();
             for (int i = 0; i < lis.Count; i++)
             {
-                await Update(lis[i].Topic, lis[i].Topic);
+                await Update(lis[i].Topic);
             }
         }
         /* [HttpGet("api")]

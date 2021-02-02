@@ -1,13 +1,12 @@
 <h1 id="tableLabel">Buttons</h1>
 
-<p *ngIf="!response"><em>Loading...</em></p>
+<p *ngIf="!response"><em><div class="spinner-grow text-muted"></div></em></p>
 
-
-<div class="Buttons">
-
-  <div *ngFor="let responses of response" class="ControlBox">
-    {{ responses.name }}
-    <br />  State:{{responses.data}}
-    <button class="buttonON" (click)="OnOff2(responses.topic)">{{ responses.data }}</button>
+<div *ngFor="let responses of response" class="card d-inline-block h-25 w-25 m-2" style="width:500px">
+  <img class="card-img-top" src="https://cdn2.vectorstock.com/i/1000x1000/36/31/yellow-light-bulb-icon-flat-style-vector-14103631.jpg" alt="Card image">
+  <div class="card-body">
+    <h4 class="card-title">{{ responses.name }}</h4>
+    <p class="card-text">State:{{responses.data}}</p>
+    <button class="btn btn-dark" (click)="OnOff2(responses.topic)">{{ responses.data }}</button>
   </div>
 </div>

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using USQLCSharp.DataAccess;
+using CPanel.Hubs;
 
 namespace CPanel
 {
@@ -27,6 +28,8 @@ namespace CPanel
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            ////services.AddSignalR();
+
             services.AddDbContext<PeopleContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
@@ -56,13 +59,18 @@ namespace CPanel
             }
 
             app.UseRouting();
-
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<ChatHub>("/hub");
+            });
+   /*         app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
-            });
+            });*/
 
             app.UseSpa(spa =>
             {
