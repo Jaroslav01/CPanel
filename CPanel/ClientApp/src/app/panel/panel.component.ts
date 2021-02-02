@@ -1,3 +1,4 @@
+
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 
@@ -16,12 +17,12 @@ export class PanelComponent {
   public currentCount = 0;
   public i = 1;
   public topic: string;
-  public OnOff2(topic: string) {
+  public OnOff2(topic2: string) {
     this.currentCount++;
     this.i = 1;
     if (this.currentCount % 2 == 0) { this.i = 0; }
     else { this.i = 1; }
-    var request = new Request("https://localhost:44333/mqtt/set?topic="+topic+"?value=0");
+    var request = new Request("https://localhost:44333/mqtt/set?topic=" + topic2 + "&value=" + this.i);
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {

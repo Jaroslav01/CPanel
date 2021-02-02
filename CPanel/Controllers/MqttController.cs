@@ -41,7 +41,7 @@ namespace CPanel.Controllers
         }
         
         [HttpGet("update")]
-        public async Task Update(string topic, string name)
+        public async Task Update(string topic, string? name = "Name")
         {
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
             var result = (await Client.SubscribeAsync(
@@ -61,6 +61,7 @@ namespace CPanel.Controllers
                         var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
                         if (item != null)
                         {
+                            if (name == "name") name = item.Name;
                             item.Data = Encoding.UTF8.GetString(msg.Payload);
                         }
                         else
