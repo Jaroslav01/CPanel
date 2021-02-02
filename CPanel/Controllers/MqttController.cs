@@ -59,9 +59,11 @@ namespace CPanel.Controllers
                         using var db = new PeopleContext();
                         var msg = me.ApplicationMessage;
                         var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
+                       
                         if (item != null)
                         {
-                            if (name == "name") name = item.Name;
+                            if (name == "Name") name = item.Name;
+                            item.Name = name;
                             item.Data = Encoding.UTF8.GetString(msg.Payload);
                         }
                         else
