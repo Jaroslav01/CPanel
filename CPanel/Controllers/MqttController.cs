@@ -96,6 +96,20 @@ namespace CPanel.Controllers
                 Topic = x.Topic                
             }).ToList();
         }
+        [HttpGet("Delete")]
+        public void Delete(int? id)
+        {
+            using var db = new PeopleContext();
+            var deleteOrderDetails =
+                from details in db.Parameters
+                where details.Id == id
+                select details;
+            foreach (var detail in deleteOrderDetails)
+            {
+                db.Parameters.Remove(detail);
+            }
+            db.SaveChanges();
+        }
         [HttpGet("GetDevices")]
         public List<Device> GetDevices()
         {

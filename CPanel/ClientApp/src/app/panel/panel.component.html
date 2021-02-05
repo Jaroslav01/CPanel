@@ -1,8 +1,8 @@
 <h1 id="tableLabel">Buttons</h1>
-<p *ngIf="!response"><em><div class="spinner-grow text-muted"></div></em></p>
+<p *ngIf="!response"><em><div class="spinner-grow text-warning"></div></em></p>
 
 <div *ngFor="let responses of response" class="card d-inline-block h-25 w-25 m-2" style="width:500px">
-  <img class="card-img-top" src="https://cdn2.vectorstock.com/i/1000x1000/36/31/yellow-light-bulb-icon-flat-style-vector-14103631.jpg" alt="Card image">
+  <img class="card-img-top" src="https://media.gettyimages.com/vectors/light-bulb-icon-vector-id1135547096?k=6&m=1135547096&s=612x612&w=0&h=TJL7GfdIobWwtscGfDV6Kzs9FS9pCq3x5Z7bSnXHQ_Y=" alt="Card image">
   <div class="card-body">
     <h4 class="card-title">{{ responses.name }}</h4>
     <p class="card-text">State:{{responses.data}}</p>

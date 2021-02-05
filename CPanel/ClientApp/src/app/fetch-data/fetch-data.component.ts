@@ -41,6 +41,14 @@ export class FetchDataComponent {
     topic.value = "topic";
     name.value = "name";
   }
+  public Delete(id: number) {
+    var request = new Request(getBaseUrl() + "mqtt/Delete?id=" + id);
+    fetch(request).then(function (response) {
+      return response.text();
+    }).then(function (text) {
+      console.log(document.getElementById(id + "topic"));
+    });
+  }
 }
 
 interface Parameter {

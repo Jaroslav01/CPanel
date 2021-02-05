@@ -1,7 +1,7 @@
 <h1 id="tableLabel">Prameters</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
-<p *ngIf="!response"><em><div class="spinner-grow text-muted"></div></em></p>
+<p *ngIf="!response"><em><div class="spinner-grow text-warning"></div></em></p>
 <table class='table table-dark table-striped' aria-labelledby="tableLabel" *ngIf="response">
   <thead>
     <tr>
@@ -13,7 +13,15 @@
   </thead>
   <tbody>
     <tr *ngFor="let responses of response">
-      <td><input readonly id="{{responses.id}}deviseId" type="text" name="deviseId" value="{{responses.deviseId}}" /></td>
+      <td>
+        <div class="form-group">
+          <label for="sel1"></label>
+          <select class="form-control form-control-sm" id="{{responses.id}}deviceid">
+            <option value="{{responses.id}}">{{response.name}}</option>
+            <option *ngFor="let responsess of response" value="{{responsess.id}}">{{responsess.name}}</option>
+          </select>
+        </div>
+      </td>
       <td><input id="{{responses.id}}name" type="text" name="name" value="{{responses.name}}" /></td>
       <td><input id="{{responses.id}}topic" type="text" name="topic" value="{{responses.topic}}" /></td>
       <td><input id="{{responses.id}}data" type="text" name="data" value="{{responses.data}}" /></td>
