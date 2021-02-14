@@ -1,43 +1,26 @@
-/* You can add global styles to this file, and also import other style files */
-
-/* Provide sufficient contrast against white background */
-a {
-  color: #0366d6;
-}
-
-code {
-  color: #e01a76;
-}
-
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-}
-
-.ControlBox {
-  margin-left: 26px;
-  display: inline-block;
-  background-color: rgb(242 242 242);
-  width: 250px;
-  border: 2px solid;
-  height: 300px;
-  border-radius: 25px;
-  text-align: center;
-  font-size: 25px;
-  position: relative;
-  /* left: 25px; */
-  padding-top: 20px;
-}
-.buttonON {
-  background-color: #371ed8;
-  color: white;
-  bottom: 20px;
-  position: absolute;
-  left: 30%;
-  width: 40%;
-  border-radius: 25px;
-}
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.example-container {
+  width: 200px;
+  height: 300px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.example-sidenav-content {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.example-sidenav {
+  padding: 20px;
+}
+.example-button-row button,
+.example-button-row a {
+  margin-right: 8px;
+}
+.example-form-field {
+  width: 200px;
+}

@@ -2,8 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { Console } from 'console';
 import { getBaseUrl } from 'src/main';
-import {MatDialog} from '@angular/material/dialog';
+import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
+export interface DialogData {
+  animal: 'panda' | 'unicorn' | 'lion';
+}
 @Component({
   selector: 'home-component',
   templateUrl: './home.component.html'
@@ -11,7 +14,9 @@ import {MatDialog} from '@angular/material/dialog';
 
 export class HomeComponent {
 
-  
+  showFiller = false;
+  value = 'Clear me';
+
 
   
   public response: Parameter[];
@@ -20,9 +25,16 @@ export class HomeComponent {
       this.response = result;
     }, error => console.error(error));
   }
+  
+  
   openDialog() {
-    this.dialog.open(DialogElementsExampleDialog);
-  }
+    this.dialog.open(DialogDataExampleDialog, {
+      data: {
+        animal: 'panda'
+      }
+    });}
+
+
   public currentCount = 0;
   public i = 1;
   public topic: string;
@@ -47,8 +59,11 @@ interface Parameter {
   topic: string;
   data: string;
 }
+
 @Component({
-  selector: 'dialog-elements-example-dialog',
-  templateUrl: 'dialog-elements-example-dialog.html',
+  selector: 'dialog-data-example-dialog',
+  templateUrl: 'dialog-data-example-dialog.html',
 })
-export class DialogElementsExampleDialog {}
+export class DialogDataExampleDialog {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {}
+}
