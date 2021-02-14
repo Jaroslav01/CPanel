@@ -136,7 +136,7 @@ namespace CPanel.Controllers
             }).ToList();
             for (int i = 0; i < lis.Count; i++)
             {
-                await Update(lis[i].Topic, "");
+                await Update(lis[i].Topic);
             }
         }
         /* [HttpGet("api")]
