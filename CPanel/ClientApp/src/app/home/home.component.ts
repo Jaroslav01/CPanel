@@ -48,6 +48,38 @@ export class HomeComponent {
       console.log(text.substring(0, 30));
     });
   }
+  public Update(id: string) {
+    var topic = <HTMLInputElement>document.getElementById(id + "topic");
+    var name = <HTMLInputElement>document.getElementById(id + "name");
+    console.log(topic.value);
+    var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&name=" + name.value);
+    fetch(request).then(function (response) {
+      return response.text();
+    }).then(function (text) {
+      console.log(document.getElementById(id + "topic"));
+    });
+  }
+  public Add(id: string) {
+    var topic = <HTMLInputElement>document.getElementById(id + "topic");
+    var name = <HTMLInputElement>document.getElementById(id + "name");
+    console.log(topic.value);
+    var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&name=" + name.value);
+    fetch(request).then(function (response) {
+      return response.text();
+    }).then(function (text) {
+      console.log(document.getElementById(id + "topic"));
+    });
+    topic.value = "topic";
+    name.value = "name";
+  }
+  public Delete(id: number) {
+    var request = new Request(getBaseUrl() + "mqtt/Delete?id=" + id);
+    fetch(request).then(function (response) {
+      return response.text();
+    }).then(function (text) {
+      console.log(document.getElementById(id + "topic"));
+    });
+  }
 }
 
 interface Parameter {

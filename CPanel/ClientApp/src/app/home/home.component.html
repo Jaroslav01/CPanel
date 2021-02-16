@@ -1,21 +1,30 @@
 <h1 id="tableLabel">Buttons</h1>
 <p *ngIf="!response"><em><div class="spinner-grow text-warning"></div></em></p>
-
-<mat-drawer-container *ngFor="let responses of response" class="card card-inline-block h-25 w-25 m-2" style="width:500px" aria-setsize="100%">
-  <mat-drawer #drawer class="example-sidenav" mode="side" style="width: 100%; height: 100%;">
-    
-
-    <mat-form-field class="example-form-field">
+<mat-drawer-container *ngFor="let responses of response" class="card d-inline-block m-2" style="width:300px; height:430px;" aria-setsize="100%">
+  <mat-drawer #drawer class="example-sidenav" mode="side" style="width: 300px; height: 430px;">
+    <h1 style="text-align: center;">{{responses.id}}</h1>
+    <mat-form-field class="example-form-field" style="width:100%;">
       <mat-label>Name</mat-label>
-      <input matInput type="text" value="{{responses.id}}">
+      <input matInput id="{{responses.id}}name" type="text" value="{{responses.name}}">
     </mat-form-field>
-    <mat-form-field class="example-form-field">
+    <mat-form-field class="example-form-field" style="width:100%;">
       <mat-label>Topic</mat-label>
-      <input matInput type="text" value="{{responses.topic}}">
+      <input matInput disabled id="{{responses.id}}topic" type="text" value="{{responses.topic}}">
     </mat-form-field>
-
+    <mat-form-field appearance="fill" style="width:100%;">
+      <mat-label>Device</mat-label>
+      <mat-select>
+        <mat-option *ngFor="let respons of response" id="{{respons.id}}select" value="{{respons.id}}:{{respons.name}}">{{respons.id}}:{{respons.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button (click)="Update(responses.id)" mat-icon-button aria-label="Example icon button with a vertical three dot icon" style="bottom: 0px; right: 0px;margin: 5%; position: absolute;">
+      <mat-icon>save</mat-icon>
+    </button>
+    <button (click)="Delete(responses.id)" mat-icon-button aria-label="Example icon button with a vertical three dot icon" style="bottom: 0px; left:40%; margin: 5%; position: absolute;">
+      <mat-icon>delete</mat-icon>
+    </button>
     <button (click)="drawer.toggle()" mat-icon-button aria-label="Example icon button with a vertical three dot icon" style="bottom: 0px; left: 0px;margin: 5%; position: absolute;">
-      <mat-icon>more_vert</mat-icon>
+      <mat-icon>arrow_forward</mat-icon>
     </button>
   </mat-drawer>
   <div class="example-sidenav-content">
@@ -25,7 +34,7 @@
         <h4 class="card-title">{{ responses.name }}</h4>
         <p class="card-text" style="top: 100%; position: sticky;"></p>
         <button (click)="drawer.toggle()" mat-icon-button aria-label="Example icon button with a vertical three dot icon">
-          <mat-icon>more_vert</mat-icon>
+          <mat-icon>settings</mat-icon>
         </button>
         <button class="btn btn-dark" (click)="OnOff2(responses.topic)" style="position: sticky; left: 100%; width: 50%;">
             <p *ngIf="responses.data == 1" style="margin-bottom: 0rem;">
@@ -40,9 +49,6 @@
         </button>
       </div>
     </div>
-   
   </div>
 </mat-drawer-container>
-
-
 <button mat-fab color="primary" aria-label="Example icon button with a vertical three dot icon" (click)="openDialog()" style="bottom: 0px; right: 0px; position: fixed; margin: 2%;"><mat-icon>add_circle</mat-icon></button>

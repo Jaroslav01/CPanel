@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MQTTnet;
+﻿using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Options;
@@ -12,12 +11,10 @@ using System.Text;
 using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
-namespace CPanel.Controllers
-{
 
-    [ApiController]
-    [Route("[controller]")]
-    public class MqttController : ControllerBase
+namespace CPanel.MqttServer
+{
+    public class Mqtt
     {
         public IMqttClient Client { get; private set; }
         public MqttClientAuthenticateResult Auth { get; private set; }
@@ -32,14 +29,11 @@ namespace CPanel.Controllers
                 .Build();
             Auth = await client.ConnectAsync(options);
         }
-        [HttpGet("Set")]
         public async Task Send(string topic, string value)
         {
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
             await Client.PublishAsync(topic, value);
         }
-
-        [HttpGet("update")]
         public async Task Update(string topic, string? name = "Name")
         {
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
@@ -82,7 +76,6 @@ namespace CPanel.Controllers
                     throw new Exception(result[0].ResultCode.ToString());
             }
         }
-        [HttpGet("GetParameters")]
         public List<Parameter> GetParameters()
         {
             using var db = new PeopleContext();
@@ -95,7 +88,6 @@ namespace CPanel.Controllers
                 Topic = x.Topic
             }).ToList();
         }
-        [HttpGet("Delete")]
         public void Delete(int? id)
         {
             using var db = new PeopleContext();
@@ -109,7 +101,6 @@ namespace CPanel.Controllers
             }
             db.SaveChanges();
         }
-        [HttpGet("GetDevices")]
         public List<Device> GetDevices()
         {
             using var db = new PeopleContext();
@@ -125,7 +116,6 @@ namespace CPanel.Controllers
                 State = x.State
             }).ToList();
         }
-        [HttpGet]
         public async Task Start()
         {
             using var db = new PeopleContext();
@@ -138,31 +128,5 @@ namespace CPanel.Controllers
                 await Update(lis[i].Topic);
             }
         }
-        /* [HttpGet("api")]
-         private List<Device> Dev()
-         {
-             Parameter parameter = new Parameter();
-             using var db = new PeopleContext();
-             return db.Devices.Select(x => new Device
-             {
-                 Id = x.Id,
-                 Topic = x.Topic,
-                 Parameters = db.Parameters.Select(r => new Parameter
-                 {
-                     Id = r.Id,
-                     DeviseId = x.Id,
-                     Name = r.Name,
-                     Topic = r.Topic,
-                     Data = r.Data,
-
-                 }).ToList(),
-                 Name = x.Name,
-                 Ip = x.Ip,
-                 Mac = x.Mac,
-                 Rssi = x.Rssi,
-                 Uptime = x.Uptime,
-                 State = x.State
-             }).ToList();
-         }*/
     }
 }
