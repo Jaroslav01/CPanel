@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
-import { Console } from 'console';
 import { getBaseUrl } from 'src/main';
 import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
@@ -8,12 +7,11 @@ export interface DialogData {
   animal: 'panda' | 'unicorn' | 'lion';
 }
 @Component({
-  selector: 'home-component',
+  selector: 'app-home',
   templateUrl: './home.component.html'
 })
 
 export class HomeComponent {
-
   showFiller = false;
   value = 'Clear me';
 
