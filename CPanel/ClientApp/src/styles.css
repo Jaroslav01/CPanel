@@ -24,3 +24,16 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .example-form-field {
   width: 200px;
 }
+
+.example-full-width{
+    margin:0.5%;
+}
+.mat-drawer-container {
+  box-shadow: 0 0 5px 0px black;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  display: block;
+  overflow: hidden;
+}

@@ -1,15 +1,19 @@
-<h1 mat-dialog-title>Favorite Animal</h1>
-<div mat-dialog-content>
-  My favorite animal is:
-  <ul>
-    <li>
-      <span *ngIf="data.animal === 'panda'">&#10003;</span> Panda
-    </li>
-    <li>
-      <span *ngIf="data.animal === 'unicorn'">&#10003;</span> Unicorn
-    </li>
-    <li>
-      <span *ngIf="data.animal === 'lion'">&#10003;</span> Lion
-    </li>
-  </ul>
+<h1 mat-dialog-title>add Device</h1>
+<form class="example-form">
+  <mat-form-field class="example-full-width">
+    <mat-label>Name</mat-label>
+    <input matInput id="name" placeholder="Name" value="">
+  </mat-form-field>
+
+<mat-form-field class="example-full-width">
+  <mat-label>Topic</mat-label>
+  <input matInput id="topic" placeholder="topic/" value="">
+</mat-form-field>
+  </form>
+
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close>Close</button>
+  <button mat-button (click)="Add()">Save</button>
+
 </div>
+

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { getBaseUrl } from 'src/main';
 import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface DialogData {
   animal: 'panda' | 'unicorn' | 'lion';
@@ -18,19 +19,26 @@ export class HomeComponent {
 
   
   public response: Parameter[];
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public dialog: MatDialog) {
+  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
     http.get<Parameter[]>(baseUrl + 'mqtt/GetParameters').subscribe(result => {
       this.response = result;
+      console.log(this.response);
     }, error => console.error(error));
   }
-  
-  
+  public openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 2000,
+    });
+  }
+
   openDialog() {
-    this.dialog.open(DialogDataExampleDialog, {
+    this.dialog.open(DialogElementsExampleDialog, {
       data: {
         animal: 'panda'
       }
-    });}
+    });
+    
+}
 
 
   public currentCount = 0;
@@ -58,27 +66,17 @@ export class HomeComponent {
     }).then(function (text) {
       console.log(document.getElementById(id + "topic"));
     });
-  }
-  public Add(id: string) {
-    var topic = <HTMLInputElement>document.getElementById(id + "topic");
-    var name = <HTMLInputElement>document.getElementById(id + "name");
-    console.log(topic.value);
-    var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&name=" + name.value);
-    fetch(request).then(function (response) {
-      return response.text();
-    }).then(function (text) {
-      console.log(document.getElementById(id + "topic"));
-    });
-    topic.value = "topic";
-    name.value = "name";
+    this.openSnackBar("Updated","Hide");
   }
   public Delete(id: number) {
+    var name = <HTMLInputElement>document.getElementById(id + "name");
+
     var request = new Request(getBaseUrl() + "mqtt/Delete?id=" + id);
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {
-      console.log(document.getElementById(id + "topic"));
     });
+    this.openSnackBar("Deleted " + name.value, "Hide");
   }
 }
 
@@ -94,6 +92,26 @@ interface Parameter {
   selector: 'dialog-data-example-dialog',
   templateUrl: 'dialog-data-example-dialog.html',
 })
-export class DialogDataExampleDialog {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {}
+export class DialogElementsExampleDialog {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData, @Inject('BASE_URL') baseUrl: string, private _snackBar: MatSnackBar) { }
+
+  public Add() {
+    var topic = <HTMLInputElement>document.getElementById("topic");
+    var name = <HTMLInputElement>document.getElementById("name");
+    console.log(topic.value);
+    var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&name=" + name.value);
+    fetch(request).then(function (response) {
+      return response.text();
+    }).then(function (text) {
+      console.log(document.getElementById("topic"));
+
+    });
+    this.openSnackBar("Saccesfull add " + name.value, "Hide");
+  }
+
+  public openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 2000,
+    });
+  }
 }

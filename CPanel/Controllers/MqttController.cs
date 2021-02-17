@@ -40,7 +40,7 @@ namespace CPanel.Controllers
         }
 
         [HttpGet("update")]
-        public async Task Update(string topic, string? name = "Name")
+        public async Task Update(string topic, string? name = null)
         {
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
             var result = (await Client.SubscribeAsync(
@@ -61,7 +61,7 @@ namespace CPanel.Controllers
 
                         if (item != null)
                         {
-                            if (name == "Name") name = item.Name;
+                            if (name == null) name = item.Name;
                             item.Name = name;
                             item.Data = Encoding.UTF8.GetString(msg.Payload);
                         }
