@@ -1,29 +1,58 @@
-import { Component } from '@angular/core';
+import * as signalR from "@microsoft/signalr";
+
+import { HttpClient } from '@angular/common/http';
+import { Component, Inject } from '@angular/core';
+import { getBaseUrl } from 'src/main';
 
 @Component({
-  selector: 'app-counter-component',
-  templateUrl: './counter.component.html'
+  selector: 'app-counter',
+  templateUrl: './counter.component.html',
+  styleUrls: ['./StyleSheet.css']
 })
+
+
+
+
+
 export class CounterComponent {
-  public currentCount = 0;
-  public i = 1;
-
-
-
-  public incrementCounter() {
-    this.currentCount++;
-    this.i = 1;
-    if (this.currentCount % 2 == 0) { this.i = 0; }
-
-    else { this.i = 1;}
-      
-
-    var request = new Request('https://localhost:44333/Mqtt/'+this.i);
-    fetch(request).then(function (response) {
-      return response.text();
-    }).then(function (text) {
-      console.log(text.substring(0, 30));
-    });
-
+ public connection = new signalR.HubConnectionBuilder()
+    .withUrl("/hub")
+  .build();
+  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+   
+ this.connection.start().catch(err => document.write(err));
   }
+
+
+
+  
+  public send() {
+    var divMessages = <HTMLDivElement>document.getElementById("divMessages");
+    var tbMessage = <HTMLInputElement>document.getElementById("tbMessage");
+    var btnSend = <HTMLButtonElement>document.getElementById("btnSend");
+  var username = new Date().getTime();
+  
+   
+
+ this.connection.send("newMessage", username, tbMessage.value)
+    .then(() => tbMessage.value = "");
+    this.connection.on("messageReceived", (username: string, message: string) => {
+  let messages = document.createElement("div");
+
+  messages.innerHTML =
+    `<div class="message-author">${username}</div><div>${message}</div>`;
+
+  divMessages.appendChild(messages);
+  divMessages.scrollTop = divMessages.scrollHeight;
+});
+
 }
+}
+
+
+
+
+
+
+
+
