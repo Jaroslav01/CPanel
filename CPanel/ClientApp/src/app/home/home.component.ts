@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { getBaseUrl } from 'src/main';
 import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -13,7 +13,7 @@ export interface DialogData {
   templateUrl: './home.component.html'
 })
 
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   showFiller = false;
   value = 'Clear me';
   public connection = new signalR.HubConnectionBuilder()
@@ -25,21 +25,44 @@ export class HomeComponent {
   public i = 1;
   public topic: string;
   public response: Parameter[];
-
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
-    this.connection.start().catch(err => document.write(err));
-
+  public res: Parameter[];
+  ngOnInit() {
+    this.start();
     this.connection.on("mqttsyncres", (response: Parameter[]) => {
-      this.response = response;
-      console.log(response);
+      this.res = response;
+      for (var i = 0; i < this.res.length; i++) {
+        for (var j = 0; j < this.res.length; j++) {
+          if (this.res[i]["id"] == this.response[j]["id"]) {
+             this.response[i]["name"] = this.res[j]["name"];
+            this.response[i]["topic"] = this.res[j]["topic"];
+            this.response[i]["deviseId"] = this.res[j]["deviseId"];
+          }
+        }
+      }
     });
+  }
+  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
+    
     http.get<Parameter[]>(baseUrl + 'mqtt/GetParameters').subscribe(result => {
+
       this.response = result;
       this.connection.send("MqttSync", this.response);
       console.log(this.response);
     }, error => console.error(error));
 
   }
+
+  public async start() {
+    try {
+      await this.connection.start();
+      console.assert(this.connection.state === signalR.HubConnectionState.Connected);
+      console.log("SignalR Connected.");
+    } catch (err) {
+      console.assert(this.connection.state === signalR.HubConnectionState.Disconnected);
+      console.log(err);
+      setTimeout(() => this.start(), 5000);
+    }
+  };
   public openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
       duration: 2000,
@@ -70,11 +93,12 @@ export class HomeComponent {
     var topic = <HTMLInputElement>document.getElementById(id + "topic");
     var name = <HTMLInputElement>document.getElementById(id + "name");
     console.log(topic.value);
-   
 
-    console.log(this.response);
-    this.response[0]["name"] = name.value;
-    console.log(this.response);
+    for (var i = 0; i < this.response.length; i++) {
+        if (this.response[i]["id"] == +id) {
+          this.response[i]["name"] = name.value;
+      }
+    }
 this.connection.send("MqttSync",this.response);
 
 console.log(this.response);

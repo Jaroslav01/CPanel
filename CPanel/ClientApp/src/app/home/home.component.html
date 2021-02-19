@@ -14,7 +14,7 @@
     <mat-form-field appearance="fill" style="width:100%;">
       <mat-label>Device</mat-label>
       <mat-select>
-        <mat-option *ngFor="let respons of response" id="{{respons.id}}select" value="{{respons.id}}:{{respons.name}}">{{respons.id}}:{{respons.name}}</mat-option>
+        <mat-option *ngFor="let respons of response" id="{{respons.id}}select" value="{{respons.id}}">{{respons.id}}:{{respons.name}}</mat-option>
       </mat-select>
     </mat-form-field>
     <button (click)="Update(responses.id)" mat-icon-button aria-label="Example icon button with a vertical three dot icon" style="bottom: 0px; right: 0px;margin: 5%; position: absolute;">

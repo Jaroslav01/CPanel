@@ -36,14 +36,16 @@ namespace CPanel.Controllers
         [HttpGet("Set")]
         public async Task Send(string topic, string value)
         {
-            await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
+            //await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
+            await Connect("localhost", "1883", "yaroslav", "220977qQ");
             await Client.PublishAsync(topic, value);
         }
 
         [HttpGet("update")]
         public async Task Update(string topic, string? name = null)
         {
-            await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
+            //await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
+            await Connect("localhost", "1883", "yaroslav", "220977qQ");
             var result = (await Client.SubscribeAsync(
                          new TopicFilterBuilder()
                          .WithTopic(topic)
