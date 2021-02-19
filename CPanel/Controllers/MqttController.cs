@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
+using CPanel.Hubs;
 namespace CPanel.Controllers
 {
 
@@ -53,7 +54,7 @@ namespace CPanel.Controllers
                 case MqttClientSubscribeResultCode.GrantedQoS0:
                 case MqttClientSubscribeResultCode.GrantedQoS1:
                 case MqttClientSubscribeResultCode.GrantedQoS2:
-                    Client.UseApplicationMessageReceivedHandler(me =>
+                    Client.UseApplicationMessageReceivedHandler( me =>
                     {
                         using var db = new PeopleContext();
                         var msg = me.ApplicationMessage;
@@ -74,8 +75,11 @@ namespace CPanel.Controllers
                                 Topic = msg.Topic
                             };
                             db.Add(parameter);
+                            
                         }
                         db.SaveChanges();
+                        
+
                     });
                     break;
                 default:

@@ -3,6 +3,7 @@ import { Component, Inject } from '@angular/core';
 import { getBaseUrl } from 'src/main';
 import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import * as signalR from "@microsoft/signalr";
 
 export interface DialogData {
   animal: 'panda' | 'unicorn' | 'lion';
@@ -15,15 +16,29 @@ export interface DialogData {
 export class HomeComponent {
   showFiller = false;
   value = 'Clear me';
+  public connection = new signalR.HubConnectionBuilder()
+    .withUrl("/hub")
+    .build();
 
 
-  
+  public currentCount = 0;
+  public i = 1;
+  public topic: string;
   public response: Parameter[];
+
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
+    this.connection.start().catch(err => document.write(err));
+
+    this.connection.on("mqttsyncres", (response: Parameter[]) => {
+      this.response = response;
+      console.log(response);
+    });
     http.get<Parameter[]>(baseUrl + 'mqtt/GetParameters').subscribe(result => {
       this.response = result;
+      this.connection.send("MqttSync", this.response);
       console.log(this.response);
     }, error => console.error(error));
+
   }
   public openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
@@ -36,14 +51,9 @@ export class HomeComponent {
       data: {
         animal: 'panda'
       }
-    });
-    
+    }); 
 }
 
-
-  public currentCount = 0;
-  public i = 1;
-  public topic: string;
   public OnOff2(topic2: string) {
     this.currentCount++;
     this.i = 1;
@@ -60,12 +70,14 @@ export class HomeComponent {
     var topic = <HTMLInputElement>document.getElementById(id + "topic");
     var name = <HTMLInputElement>document.getElementById(id + "name");
     console.log(topic.value);
-    var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&name=" + name.value);
-    fetch(request).then(function (response) {
-      return response.text();
-    }).then(function (text) {
-      console.log(document.getElementById(id + "topic"));
-    });
+   
+
+    console.log(this.response);
+    this.response[0]["name"] = name.value;
+    console.log(this.response);
+this.connection.send("MqttSync",this.response);
+
+console.log(this.response);
     this.openSnackBar("Updated","Hide");
   }
   public Delete(id: number) {
@@ -75,6 +87,9 @@ export class HomeComponent {
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {
+    });
+    this.connection.on("mqttsyncres", (response: Parameter[]) => {
+      this.response = response;
     });
     this.openSnackBar("Deleted " + name.value, "Hide");
   }
