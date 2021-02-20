@@ -1,5 +1,7 @@
+using CPanel.Controllers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using System.Threading;
 
 namespace CPanel
 {
@@ -7,7 +9,12 @@ namespace CPanel
     {
         public static void Main(string[] args)
         {
+            MqttController mqttController = new MqttController();
+            Thread thread1 = new Thread(mqttController.knjc);
+            thread1.Start();
             CreateHostBuilder(args).Build().Run();
+
+            
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

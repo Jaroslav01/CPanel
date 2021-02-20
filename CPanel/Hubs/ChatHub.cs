@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNet.SignalR.Client;
 using Microsoft.AspNetCore.SignalR;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
@@ -23,8 +24,10 @@ namespace CPanel.Hubs
         }
         public async Task MqttSync(List<Parameter> parameters)
         {
-
-            await Clients.All.SendAsync("mqttsyncres", parameters);
+            if (parameters != null && Clients != null )
+            {
+                await Clients.All.SendAsync("mqttsyncres", parameters);
+            }
         }
     }
 }

@@ -13,6 +13,10 @@ using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
 using CPanel.Hubs;
+//using Microsoft.AspNet.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
+using System.Threading;
+
 namespace CPanel.Controllers
 {
 
@@ -20,6 +24,8 @@ namespace CPanel.Controllers
     [Route("[controller]")]
     public class MqttController : ControllerBase
     {
+        HubConnection connection;
+
         public IMqttClient Client { get; private set; }
         public MqttClientAuthenticateResult Auth { get; private set; }
         public async Task Connect(string ip, string port, string login, string password)
@@ -70,6 +76,7 @@ namespace CPanel.Controllers
                         }
                         else
                         {
+                            if (name == null) name = "Lamp";
                             var parameter = new Parameter
                             {
                                 Name = name,
@@ -77,11 +84,9 @@ namespace CPanel.Controllers
                                 Topic = msg.Topic
                             };
                             db.Add(parameter);
-                            
                         }
                         db.SaveChanges();
-                        
-
+                        Start();
                     });
                     break;
                 default:
@@ -114,6 +119,7 @@ namespace CPanel.Controllers
                 db.Parameters.Remove(detail);
             }
             db.SaveChanges();
+            Start();
         }
         [HttpGet("GetDevices")]
         public List<Device> GetDevices()
@@ -131,18 +137,44 @@ namespace CPanel.Controllers
                 State = x.State
             }).ToList();
         }
-        [HttpGet]
-        public async Task Start()
-        {
+
+        public async void knjc() {
+            
+            ChatHub chatHub = new ChatHub();
             using var db = new PeopleContext();
             var lis = db.Parameters.Select(x => new Parameter
             {
-                Topic = x.Topic
+                Topic = x.Topic,
+                Id = x.Id,
+                DeviseId = x.DeviseId,
+                Data = x.Data,
+                Name = x.Name
             }).ToList();
             for (int i = 0; i < lis.Count; i++)
             {
+                Thread.Sleep(100);
                 await Update(lis[i].Topic);
             }
+            
+        }
+        
+        public async void Start()
+        {
+            connection = new HubConnectionBuilder()
+                    .WithUrl("https://localhost:5001/Hub")
+                    .WithAutomaticReconnect()
+                   .Build();
+            await connection.StartAsync();
+            using var db = new PeopleContext();
+            var lis = db.Parameters.Select(x => new Parameter
+            {
+                Topic = x.Topic,
+                Id = x.Id,
+                DeviseId = x.DeviseId,
+                Data = x.Data,
+                Name = x.Name
+            }).ToList();
+            if(lis != null) await connection.InvokeAsync("MqttSync", lis);
         }
         /* [HttpGet("api")]
          private List<Device> Dev()

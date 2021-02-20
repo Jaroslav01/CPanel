@@ -36,6 +36,7 @@ export class HomeComponent implements OnInit {
              this.response[i]["name"] = this.res[j]["name"];
             this.response[i]["topic"] = this.res[j]["topic"];
             this.response[i]["deviseId"] = this.res[j]["deviseId"];
+            this.response[i]["data"] = this.res[j]["data"];
           }
         }
       }
@@ -54,7 +55,7 @@ export class HomeComponent implements OnInit {
 
   public async start() {
     try {
-      await this.connection.start();
+      this.connection.start();
       console.assert(this.connection.state === signalR.HubConnectionState.Connected);
       console.log("SignalR Connected.");
     } catch (err) {
@@ -92,17 +93,13 @@ export class HomeComponent implements OnInit {
   public Update(id: string) {
     var topic = <HTMLInputElement>document.getElementById(id + "topic");
     var name = <HTMLInputElement>document.getElementById(id + "name");
-    console.log(topic.value);
-
-    for (var i = 0; i < this.response.length; i++) {
-        if (this.response[i]["id"] == +id) {
-          this.response[i]["name"] = name.value;
-      }
-    }
-this.connection.send("MqttSync",this.response);
-
-console.log(this.response);
-    this.openSnackBar("Updated","Hide");
+var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&name=" + name.value);
+    fetch(request).then(function (response) {
+      return response.text();
+    }).then(function (text) {
+      console.log(document.getElementById(id + "topic"));
+    });
+    this.openSnackBar("Updated", "Hide");
   }
   public Delete(id: number) {
     var name = <HTMLInputElement>document.getElementById(id + "name");
