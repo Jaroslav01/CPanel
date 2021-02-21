@@ -37,6 +37,10 @@ export class HomeComponent implements OnInit {
             this.response[i]["topic"] = this.res[j]["topic"];
             this.response[i]["deviseId"] = this.res[j]["deviseId"];
             this.response[i]["data"] = this.res[j]["data"];
+            continue;
+          }
+          else {
+            this.response.push(this.res[j]);
           }
         }
       }

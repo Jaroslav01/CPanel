@@ -24,8 +24,6 @@ namespace CPanel.Controllers
     [Route("[controller]")]
     public class MqttController : ControllerBase
     {
-        HubConnection connection;
-
         public IMqttClient Client { get; private set; }
         public MqttClientAuthenticateResult Auth { get; private set; }
         public async Task Connect(string ip, string port, string login, string password)
@@ -160,11 +158,6 @@ namespace CPanel.Controllers
         
         public async void Start()
         {
-            connection = new HubConnectionBuilder()
-                    .WithUrl("https://localhost:5001/Hub")
-                    .WithAutomaticReconnect()
-                   .Build();
-            await connection.StartAsync();
             using var db = new PeopleContext();
             var lis = db.Parameters.Select(x => new Parameter
             {
