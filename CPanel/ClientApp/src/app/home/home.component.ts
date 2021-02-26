@@ -26,27 +26,7 @@ export class HomeComponent implements OnInit {
   public topic: string;
   public response: Parameter[];
   public res: Parameter[];
-  ngOnInit() {
-    this.start();
-    this.connection.on("mqttsyncres", (action, id, deviseId, name, topic, data) => {
-      console.log(name);
-      switch (action) {
-        case "update":
-          for (var i = 0; i < this.response.length; i++) {
-            if (this.response[i]["id"] == id) {
-              this.response[i]["deviseId"] == deviseId;
-              this.response[i]["name"] == name;
-              this.response[i]["topic"] == topic;
-              this.response[i]["data"] == data;
-            }
-          }
-        default:
-          break;
-      }
-      
-    });
-  }
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
+    constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
     
     http.get<Parameter[]>(baseUrl + 'mqtt/GetParameters').subscribe(result => {
 
@@ -55,6 +35,27 @@ export class HomeComponent implements OnInit {
     }, error => console.error(error));
 
   }
+  ngOnInit() {
+    this.start();
+    this.connection.on("mqttsyncres", (action, id, deviseId, name, topic, data) => {
+      console.log(name);
+      switch (action) {
+        case "update":
+          for (var i = 0; i < this.response.length; i++) {
+            if (this.response[i]["id"] == id) {
+              this.response[i]["deviseId"] = deviseId;
+              this.response[i]["name"] = name;
+              this.response[i]["topic"] = topic;
+              this.response[i]["data"] = data;
+            }
+          }
+        default:
+          break;
+      }
+      
+    });
+  }
+
 
   public async start() {
     try {
