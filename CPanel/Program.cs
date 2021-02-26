@@ -10,7 +10,7 @@ namespace CPanel
         public static void Main(string[] args)
         {
             MqttController mqttController = new MqttController();
-            Thread thread1 = new Thread(mqttController.knjc);
+            Thread thread1 = new Thread(mqttController.Start);
             thread1.Start();
             CreateHostBuilder(args).Build().Run();
 

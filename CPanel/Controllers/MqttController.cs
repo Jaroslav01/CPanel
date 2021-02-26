@@ -24,6 +24,14 @@ namespace CPanel.Controllers
     [Route("[controller]")]
     public class MqttController : ControllerBase
     {
+        public readonly HubConnection connection = new HubConnectionBuilder()
+                    .WithUrl("https://localhost:5001/Hub")
+                    .WithAutomaticReconnect()
+                   .Build();
+        public async void Start()
+        {
+            await connection.StartAsync();
+        }
         public IMqttClient Client { get; private set; }
         public MqttClientAuthenticateResult Auth { get; private set; }
         public async Task Connect(string ip, string port, string login, string password)
@@ -44,7 +52,6 @@ namespace CPanel.Controllers
             await Connect("localhost", "1883", "yaroslav", "220977qQ");
             await Client.PublishAsync(topic, value);
         }
-
         [HttpGet("update")]
         public async Task Update(string topic, string? name = null)
         {
@@ -60,17 +67,20 @@ namespace CPanel.Controllers
                 case MqttClientSubscribeResultCode.GrantedQoS0:
                 case MqttClientSubscribeResultCode.GrantedQoS1:
                 case MqttClientSubscribeResultCode.GrantedQoS2:
-                    Client.UseApplicationMessageReceivedHandler( me =>
+                    Client.UseApplicationMessageReceivedHandler(async me =>
                     {
                         using var db = new PeopleContext();
                         var msg = me.ApplicationMessage;
                         var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
+                        await connection.StartAsync();
 
                         if (item != null)
                         {
                             if (name == null) name = item.Name;
                             item.Name = name;
                             item.Data = Encoding.UTF8.GetString(msg.Payload);
+                            await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data);
+
                         }
                         else
                         {
@@ -82,9 +92,9 @@ namespace CPanel.Controllers
                                 Topic = msg.Topic
                             };
                             db.Add(parameter);
+                            await connection.SendAsync("MqttSync", "add", parameter.Id, parameter.DeviseId, parameter.Name, parameter.Topic, parameter.Data);
                         }
                         db.SaveChanges();
-                        Start();
                     });
                     break;
                 default:
@@ -156,7 +166,7 @@ namespace CPanel.Controllers
             
         }
         
-        public async void Start()
+        public async void Start1()
         {
             using var db = new PeopleContext();
             var lis = db.Parameters.Select(x => new Parameter

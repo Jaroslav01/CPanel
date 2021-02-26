@@ -20,14 +20,10 @@ namespace CPanel.Hubs
         public async Task Update(long id, string name)
         {
             await Clients.All.SendAsync("get", id, name);
-
         }
-        public async Task MqttSync(List<Parameter> parameters)
+        public async Task MqttSync(string action, int id, int deviseId, string name, string topic, string data)
         {
-            if (parameters != null && Clients != null )
-            {
-                await Clients.All.SendAsync("mqttsyncres", parameters);
-            }
+            await Clients.All.SendAsync("mqttsyncres", action, id, deviseId, name, topic, data);
         }
     }
 }

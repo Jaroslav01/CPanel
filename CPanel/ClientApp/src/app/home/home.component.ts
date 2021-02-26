@@ -28,22 +28,22 @@ export class HomeComponent implements OnInit {
   public res: Parameter[];
   ngOnInit() {
     this.start();
-    this.connection.on("mqttsyncres", (response: Parameter[]) => {
-      this.res = response;
-      for (var i = 0; i < this.res.length; i++) {
-        for (var j = 0; j < this.res.length; j++) {
-          if (this.res[i]["id"] == this.response[j]["id"]) {
-             this.response[i]["name"] = this.res[j]["name"];
-            this.response[i]["topic"] = this.res[j]["topic"];
-            this.response[i]["deviseId"] = this.res[j]["deviseId"];
-            this.response[i]["data"] = this.res[j]["data"];
-            continue;
+    this.connection.on("mqttsyncres", (action, id, deviseId, name, topic, data) => {
+      console.log(name);
+      switch (action) {
+        case "update":
+          for (var i = 0; i < this.response.length; i++) {
+            if (this.response[i]["id"] == id) {
+              this.response[i]["deviseId"] == deviseId;
+              this.response[i]["name"] == name;
+              this.response[i]["topic"] == topic;
+              this.response[i]["data"] == data;
+            }
           }
-          else {
-            this.response.push(this.res[j]);
-          }
-        }
+        default:
+          break;
       }
+      
     });
   }
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
@@ -51,7 +51,6 @@ export class HomeComponent implements OnInit {
     http.get<Parameter[]>(baseUrl + 'mqtt/GetParameters').subscribe(result => {
 
       this.response = result;
-      this.connection.send("MqttSync", this.response);
       console.log(this.response);
     }, error => console.error(error));
 
