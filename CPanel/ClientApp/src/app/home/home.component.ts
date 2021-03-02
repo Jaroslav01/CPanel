@@ -38,7 +38,12 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.start();
     this.connection.on("mqttsyncres", (action, id, deviseId, name, topic, data) => {
+      console.log(action);
+      console.log(id);
+      console.log(deviseId);
       console.log(name);
+      console.log(topic);
+      console.log(data);
       switch (action) {
         case "update":
           for (var i = 0; i < this.response.length; i++) {

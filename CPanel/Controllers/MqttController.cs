@@ -19,7 +19,6 @@ using System.Threading;
 
 namespace CPanel.Controllers
 {
-
     [ApiController]
     [Route("[controller]")]
     public class MqttController : ControllerBase
@@ -28,7 +27,8 @@ namespace CPanel.Controllers
                     .WithUrl("https://localhost:5001/Hub")
                     .WithAutomaticReconnect()
                    .Build();
-        public async void Start()
+
+        public async void Start15()
         {
             await connection.StartAsync();
         }
@@ -48,15 +48,15 @@ namespace CPanel.Controllers
         [HttpGet("Set")]
         public async Task Send(string topic, string value)
         {
-            //await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
-            await Connect("localhost", "1883", "yaroslav", "220977qQ");
+            await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
+            //await Connect("localhost", "1883", "yaroslav", "220977qQ");
             await Client.PublishAsync(topic, value);
         }
         [HttpGet("update")]
         public async Task Update(string topic, string? name = null)
         {
-            //await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
-            await Connect("localhost", "1883", "yaroslav", "220977qQ");
+            await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
+            //await Connect("localhost", "1883", "yaroslav", "220977qQ");
             var result = (await Client.SubscribeAsync(
                          new TopicFilterBuilder()
                          .WithTopic(topic)
@@ -73,14 +73,12 @@ namespace CPanel.Controllers
                         var msg = me.ApplicationMessage;
                         var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
                         await connection.StartAsync();
-
                         if (item != null)
                         {
                             if (name == null) name = item.Name;
                             item.Name = name;
                             item.Data = Encoding.UTF8.GetString(msg.Payload);
                             await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data);
-
                         }
                         else
                         {
@@ -127,7 +125,6 @@ namespace CPanel.Controllers
                 db.Parameters.Remove(detail);
             }
             db.SaveChanges();
-            Start();
         }
         [HttpGet("GetDevices")]
         public List<Device> GetDevices()
@@ -145,65 +142,33 @@ namespace CPanel.Controllers
                 State = x.State
             }).ToList();
         }
-
-        public async void knjc() {
-            
-            ChatHub chatHub = new ChatHub();
-            using var db = new PeopleContext();
-            var lis = db.Parameters.Select(x => new Parameter
-            {
-                Topic = x.Topic,
-                Id = x.Id,
-                DeviseId = x.DeviseId,
-                Data = x.Data,
-                Name = x.Name
-            }).ToList();
-            for (int i = 0; i < lis.Count; i++)
-            {
-                Thread.Sleep(100);
-                await Update(lis[i].Topic);
-            }
-            
-        }
-        
-        public async void Start1()
+        [HttpGet("UpdateDataAsync")]
+        /*public void S()
+        {
+            MqttController mqttController = new MqttController();
+            Thread newThread = new Thread(mqttController.UpdateDataAsync);
+            newThread.Start();
+        }*/
+        public async Task UpdateDataAsync()
         {
             using var db = new PeopleContext();
-            var lis = db.Parameters.Select(x => new Parameter
+            while (true)
             {
-                Topic = x.Topic,
-                Id = x.Id,
-                DeviseId = x.DeviseId,
-                Data = x.Data,
-                Name = x.Name
-            }).ToList();
-            if(lis != null) await connection.InvokeAsync("MqttSync", lis);
+                var parameters = db.Parameters.Select(x => new Parameter
+                {
+                    Id = x.Id,
+                    Data = x.Data,
+                    DeviseId = x.DeviseId,
+                    Name = x.Name,
+                    Topic = x.Topic
+                }).ToList();
+                foreach (var parameter in parameters)
+                {
+                    await Update(parameter.Topic);
+                    Thread.Sleep(1000);
+                }
+            }
         }
-        /* [HttpGet("api")]
-         private List<Device> Dev()
-         {
-             Parameter parameter = new Parameter();
-             using var db = new PeopleContext();
-             return db.Devices.Select(x => new Device
-             {
-                 Id = x.Id,
-                 Topic = x.Topic,
-                 Parameters = db.Parameters.Select(r => new Parameter
-                 {
-                     Id = r.Id,
-                     DeviseId = x.Id,
-                     Name = r.Name,
-                     Topic = r.Topic,
-                     Data = r.Data,
 
-                 }).ToList(),
-                 Name = x.Name,
-                 Ip = x.Ip,
-                 Mac = x.Mac,
-                 Rssi = x.Rssi,
-                 Uptime = x.Uptime,
-                 State = x.State
-             }).ToList();
-         }*/
     }
 }

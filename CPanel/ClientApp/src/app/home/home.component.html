@@ -37,10 +37,10 @@
           <mat-icon>settings</mat-icon>
         </button>
         <button class="btn btn-dark" (click)="OnOff2(responses.topic)" style="position: sticky; left: 100%; width: 50%;">
-          <p *ngIf="responses.data == 1" style="margin-bottom: 0rem;">
+          <p *ngIf="responses.data == 0" style="margin-bottom: 0rem;">
             Turn Off
           </p>
-          <p *ngIf="responses.data == 0" style="margin-bottom: 0rem;">
+          <p *ngIf="responses.data == 1" style="margin-bottom: 0rem;">
             Turn On
           </p>
         </button>
