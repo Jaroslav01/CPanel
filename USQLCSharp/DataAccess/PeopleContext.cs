@@ -14,7 +14,8 @@ namespace USQLCSharp.DataAccess
         public DbSet<Parameter> Parameters { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=DESKTOP-611SA6B;Database=CPanel2d;Trusted_Connection=True;");
+            //optionsBuilder.UseSqlServer("Server=DESKTOP-611SA6B;Database=CPanel2d;Trusted_Connection=True;");
+            optionsBuilder.UseSqlServer("Server=LAPTOP-NL8GVBDL\\SQLEXPRESS;Database=CPanel;Trusted_Connection=True;");
         }
     }
 }

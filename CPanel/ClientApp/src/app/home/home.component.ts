@@ -31,27 +31,17 @@ export class HomeComponent implements OnInit {
   }
   ngOnInit() {
     this.start();
-    this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, name: string, topic: string, data: string, type: string) => {
-      console.log(action);
-      console.log(id);
-      console.log(deviseId);
-      console.log(name);
-      console.log(topic);
-      console.log(data);
+    this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, name: string, topic: string, data: number, type: string) => {
+      var item: Parameter;
+      item = { id, deviseId, name, topic, data, type };
       switch (action) {
         case "update":
           for (var i = 0; i < this.response.length; i++) {
             if (this.response[i]["id"] == id) {
-              this.response[i]["deviseId"] = deviseId;
-              this.response[i]["name"] = name;
-              this.response[i]["topic"] = topic;
-              this.response[i]["data"] = data;
-              this.response[i]["type"] = type;
+              this.response[i] = item;
             }
           }
         case "add":
-          var item: Parameter;
-          item = { id, deviseId, name, topic, data, type };
           console.log(item);
           this.response.push(item);
         default:
@@ -125,7 +115,7 @@ interface Parameter {
   deviseId: number;
   name: string;
   topic: string;
-  data: string;
+  data: number;
   type: string;
 }
 

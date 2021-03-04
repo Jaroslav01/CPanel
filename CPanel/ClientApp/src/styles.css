@@ -37,3 +37,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   display: block;
   overflow: hidden;
 }
+.card-title {
+  margin-bottom: .75rem;
+  text-align: -webkit-center;
+}

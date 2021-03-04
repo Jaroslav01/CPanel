@@ -24,7 +24,8 @@ namespace CPanel.Controllers
     public class MqttController : ControllerBase
     {
         public readonly HubConnection connection = new HubConnectionBuilder()
-                    .WithUrl("https://localhost:5001/Hub")
+                    //.WithUrl("https://localhost:5001/Hub")
+                    .WithUrl("https://localhost:44333/Hub")
                     .WithAutomaticReconnect()
                    .Build();
 
@@ -112,6 +113,7 @@ namespace CPanel.Controllers
                 DeviseId = x.DeviseId,
                 Name = x.Name,
                 Topic = x.Topic,
+                Type = x.Type 
             }).ToList();
         }
         [HttpGet("Delete")]

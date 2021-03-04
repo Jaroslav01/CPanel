@@ -36,8 +36,14 @@
         <button (click)="drawer.toggle()" mat-icon-button aria-label="Example icon button with a vertical three dot icon">
           <mat-icon>settings</mat-icon>
         </button>
-        
-
+        <mat-slider *ngIf="responses.type == 'slider'"
+                    style="min-width:80%;padding:0px;"
+                    class="example-margin"
+                    [(ngModel)]="responses.data">
+        </mat-slider>
+        <mat-slide-toggle *ngIf="responses.type == 'button'"
+                          class="example-margin">
+        </mat-slide-toggle>
       </div>
     </div>
   </div>
