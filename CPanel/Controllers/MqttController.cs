@@ -53,7 +53,7 @@ namespace CPanel.Controllers
             await Client.PublishAsync(topic, value);
         }
         [HttpGet("update")]
-        public async Task Update(string topic, string? name = null)
+        public async Task Update(string topic, string? type = null, string? name = null)
         {
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
             //await Connect("localhost", "1883", "yaroslav", "220977qQ");
@@ -77,8 +77,9 @@ namespace CPanel.Controllers
                         {
                             if (name == null) name = item.Name;
                             item.Name = name;
+                            item.Type = type;
                             item.Data = Encoding.UTF8.GetString(msg.Payload);
-                            await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data);
+                            await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
                         }
                         else
                         {
@@ -86,11 +87,12 @@ namespace CPanel.Controllers
                             var parameter = new Parameter
                             {
                                 Name = name,
+                                Type = type,
                                 Data = Encoding.UTF8.GetString(msg.Payload),
                                 Topic = msg.Topic
                             };
                             db.Add(parameter);
-                            await connection.SendAsync("MqttSync", "add", parameter.Id, parameter.DeviseId, parameter.Name, parameter.Topic, parameter.Data);
+                            await connection.SendAsync("MqttSync", "add", parameter.Id, parameter.DeviseId, parameter.Name, parameter.Topic, parameter.Data, parameter.Type);
                         }
                         db.SaveChanges();
                     });
@@ -109,7 +111,7 @@ namespace CPanel.Controllers
                 Data = x.Data,
                 DeviseId = x.DeviseId,
                 Name = x.Name,
-                Topic = x.Topic
+                Topic = x.Topic,
             }).ToList();
         }
         [HttpGet("Delete")]

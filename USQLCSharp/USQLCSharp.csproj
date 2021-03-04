@@ -210,6 +210,10 @@
     <Compile Include="Migrations\20210129202151_Devise.designer.cs">
       <DependentUpon>20210129202151_Devise.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20210302114448_addType.cs" />
+    <Compile Include="Migrations\20210302114448_addType.designer.cs">
+      <DependentUpon>20210302114448_addType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\PeopleContextModelSnapshot.cs" />
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\Device.cs" />
