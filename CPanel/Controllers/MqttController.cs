@@ -24,8 +24,8 @@ namespace CPanel.Controllers
     public class MqttController : ControllerBase
     {
         public readonly HubConnection connection = new HubConnectionBuilder()
-                    //.WithUrl("https://localhost:5001/Hub")
-                    .WithUrl("https://localhost:44333/Hub")
+                    .WithUrl("https://localhost:5001/Hub")
+                    //.WithUrl("https://localhost:44333/Hub")
                     .WithAutomaticReconnect()
                    .Build();
 
@@ -117,8 +117,10 @@ namespace CPanel.Controllers
             }).ToList();
         }
         [HttpGet("Delete")]
-        public void Delete(int? id)
+        public async void Delete(int? id)
         {
+            await connection.StartAsync();
+            
             using var db = new PeopleContext();
             var deleteOrderDetails =
                 from details in db.Parameters
@@ -129,6 +131,7 @@ namespace CPanel.Controllers
                 db.Parameters.Remove(detail);
             }
             db.SaveChanges();
+            await connection.SendAsync("MqttSync", "delete", id, null, "null", "null", "null");
         }
         [HttpGet("GetDevices")]
         public List<Device> GetDevices()

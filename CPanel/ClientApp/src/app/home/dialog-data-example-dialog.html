@@ -9,12 +9,14 @@
     <input matInput id="topic" placeholder="topic/" value="">
   </mat-form-field>
 </form>
-<form class="example-form">
-  <mat-form-field class="example-full-width">
-    <mat-label>Topic</mat-label>
-    <input matInput id="type" placeholder="button">
-  </mat-form-field>
-</form>
+<mat-form-field appearance="fill">
+  <mat-label>Select control type</mat-label>
+  <mat-select [(value)]="selected">
+    <mat-option>None</mat-option>
+    <mat-option value="button">Button</mat-option>
+    <mat-option value="slider">Slider</mat-option>
+  </mat-select>
+</mat-form-field>
 <div mat-dialog-actions>
   <button mat-button mat-dialog-close>Close</button>
   <button mat-button (click)="Add()">Save</button>

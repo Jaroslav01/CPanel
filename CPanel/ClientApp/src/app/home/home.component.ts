@@ -36,14 +36,21 @@ export class HomeComponent implements OnInit {
       item = { id, deviseId, name, topic, data, type };
       switch (action) {
         case "update":
+          console.log(this.response);
+
           for (var i = 0; i < this.response.length; i++) {
             if (this.response[i]["id"] == id) {
               this.response[i] = item;
             }
           }
         case "add":
-          console.log(item);
           this.response.push(item);
+        case "delete":
+          for (var i = 0; i < this.response.length; i++) {
+            if (this.response[i]["id"] == id) {
+              delete this.response[i];
+            }
+          }
         default:
           break;
       }
@@ -126,11 +133,11 @@ interface Parameter {
 export class DialogElementsExampleDialog {
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData, @Inject('BASE_URL') baseUrl: string, private _snackBar: MatSnackBar) { }
   public Add() {
+    var type = "button";
     var topic = <HTMLInputElement>document.getElementById("topic");
     var name = <HTMLInputElement>document.getElementById("name");
-    var type = <HTMLInputElement>document.getElementById("type");
     console.log(topic.value);
-    var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&type" + type.value + "&name=" + name.value);
+    var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&type" + type + "&name=" + name.value);
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {
