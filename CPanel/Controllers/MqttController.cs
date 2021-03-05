@@ -93,7 +93,17 @@ namespace CPanel.Controllers
                                 Topic = msg.Topic
                             };
                             db.Add(parameter);
-                            await connection.SendAsync("MqttSync", "add", parameter.Id, parameter.DeviseId, parameter.Name, parameter.Topic, parameter.Data, parameter.Type);
+                            var item2 = GetParameters();
+                            if (item2 != null)
+                            {
+                                for (int i = 0; i < item2.Count; i++)
+                                {
+                                    if (item2[i].Topic == msg.Topic)
+                                    {
+                                        await connection.SendAsync("MqttSync", "add", item2[i].Id, item2[i].DeviseId, item2[i].Name, item2[i].Topic, item2[i].Data, item2[i].Type);
+                                    }
+                                }
+                            }  
                         }
                         db.SaveChanges();
                     });
@@ -102,25 +112,11 @@ namespace CPanel.Controllers
                     throw new Exception(result[0].ResultCode.ToString());
             }
         }
-        [HttpGet("GetParameters")]
-        public List<Parameter> GetParameters()
-        {
-            using var db = new PeopleContext();
-            return db.Parameters.Select(x => new Parameter
-            {
-                Id = x.Id,
-                Data = x.Data,
-                DeviseId = x.DeviseId,
-                Name = x.Name,
-                Topic = x.Topic,
-                Type = x.Type 
-            }).ToList();
-        }
         [HttpGet("Delete")]
         public async void Delete(int? id)
         {
             await connection.StartAsync();
-            
+
             using var db = new PeopleContext();
             var deleteOrderDetails =
                 from details in db.Parameters
@@ -133,6 +129,22 @@ namespace CPanel.Controllers
             db.SaveChanges();
             await connection.SendAsync("MqttSync", "delete", id, null, "null", "null", "null");
         }
+        [HttpGet("GetParameters")]
+        public List<Parameter> GetParameters()
+        {
+            using var db = new PeopleContext();
+            var response = db.Parameters.Select(x => new Parameter
+            {
+                Id = x.Id,
+                Data = x.Data,
+                DeviseId = x.DeviseId,
+                Name = x.Name,
+                Topic = x.Topic,
+                Type = x.Type 
+            }).ToList();
+            return response;
+        }
+        
         [HttpGet("GetDevices")]
         public List<Device> GetDevices()
         {

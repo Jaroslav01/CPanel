@@ -48,7 +48,7 @@ export class HomeComponent implements OnInit {
         case "delete":
           for (var i = 0; i < this.response.length; i++) {
             if (this.response[i]["id"] == id) {
-              delete this.response[i];
+              this.response.pop();
             }
           }
         default:
