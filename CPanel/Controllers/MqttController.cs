@@ -57,48 +57,53 @@ namespace CPanel.Controllers
         {
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
             //await Connect("localhost", "1883", "yaroslav", "220977qQ");
-            var result = (await Client.SubscribeAsync(
-                         new TopicFilterBuilder()
-                         .WithTopic(topic)
-                         .Build()
-                     )).Items.ToList();
-            switch (result[0].ResultCode)
+            while (true)
             {
-                case MqttClientSubscribeResultCode.GrantedQoS0:
-                case MqttClientSubscribeResultCode.GrantedQoS1:
-                case MqttClientSubscribeResultCode.GrantedQoS2:
-                    Client.UseApplicationMessageReceivedHandler(async me =>
-                    {
-                        using var db = new PeopleContext();
-                        var msg = me.ApplicationMessage;
-                        var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
-                        await connection.StartAsync();
-                        if (item != null)
+
+
+                var result = (await Client.SubscribeAsync(
+                             new TopicFilterBuilder()
+                             .WithTopic(topic)
+                             .Build()
+                         )).Items.ToList();
+                switch (result[0].ResultCode)
+                {
+                    case MqttClientSubscribeResultCode.GrantedQoS0:
+                    case MqttClientSubscribeResultCode.GrantedQoS1:
+                    case MqttClientSubscribeResultCode.GrantedQoS2:
+                        Client.UseApplicationMessageReceivedHandler(async me =>
                         {
-                            if (name == null) name = item.Name;
-                            item.Name = name;
-                            item.Type = type;
-                            item.Data = Encoding.UTF8.GetString(msg.Payload);
-                            await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
-                        }
-                        else
-                        {
-                            if (name == null) name = "Lamp";
-                            var parameter = new Parameter
+                            using var db = new PeopleContext();
+                            var msg = me.ApplicationMessage;
+                            var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
+                            await connection.StartAsync();
+                            if (item != null)
                             {
-                                Name = name,
-                                Type = type,
-                                Data = Encoding.UTF8.GetString(msg.Payload),
-                                Topic = msg.Topic
-                            };
-                            db.Add(parameter);
-                            await connection.SendAsync("MqttSync", "add", parameter.Id, parameter.DeviseId, parameter.Name, parameter.Topic, parameter.Data, parameter.Type);
-                        }
-                        db.SaveChanges();
-                    });
-                    break;
-                default:
-                    throw new Exception(result[0].ResultCode.ToString());
+                                if (name == null) name = item.Name;
+                                item.Name = name;
+                                item.Type = type;
+                                item.Data = Encoding.UTF8.GetString(msg.Payload);
+                                await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+                            }
+                            else
+                            {
+                                if (name == null) name = "Lamp";
+                                var parameter = new Parameter
+                                {
+                                    Name = name,
+                                    Type = type,
+                                    Data = Encoding.UTF8.GetString(msg.Payload),
+                                    Topic = msg.Topic
+                                };
+                                db.Add(parameter);
+                                await connection.SendAsync("MqttSync", "add", parameter.Id, parameter.DeviseId, parameter.Name, parameter.Topic, parameter.Data, parameter.Type);
+                            }
+                            db.SaveChanges();
+                        });
+                        break;
+                    default:
+                        throw new Exception(result[0].ResultCode.ToString());
+                }
             }
         }
         [HttpGet("GetParameters")]
