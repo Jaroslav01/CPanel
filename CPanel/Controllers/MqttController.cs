@@ -25,6 +25,7 @@ namespace CPanel.Controllers
     {
         public readonly HubConnection connection = new HubConnectionBuilder()
                     .WithUrl("https://localhost:5001/Hub")
+                    //.WithUrl("https://localhost:44333/Hub")
                     .WithAutomaticReconnect()
                    .Build();
 
@@ -57,71 +58,65 @@ namespace CPanel.Controllers
         {
             await Connect("176.36.127.144", "1883", "yaroslav", "220977qQ");
             //await Connect("localhost", "1883", "yaroslav", "220977qQ");
-            while (true)
+            var result = (await Client.SubscribeAsync(
+                         new TopicFilterBuilder()
+                         .WithTopic(topic)
+                         .Build()
+                     )).Items.ToList();
+            switch (result[0].ResultCode)
             {
-
-
-                var result = (await Client.SubscribeAsync(
-                             new TopicFilterBuilder()
-                             .WithTopic(topic)
-                             .Build()
-                         )).Items.ToList();
-                switch (result[0].ResultCode)
-                {
-                    case MqttClientSubscribeResultCode.GrantedQoS0:
-                    case MqttClientSubscribeResultCode.GrantedQoS1:
-                    case MqttClientSubscribeResultCode.GrantedQoS2:
-                        Client.UseApplicationMessageReceivedHandler(async me =>
+                case MqttClientSubscribeResultCode.GrantedQoS0:
+                case MqttClientSubscribeResultCode.GrantedQoS1:
+                case MqttClientSubscribeResultCode.GrantedQoS2:
+                    Client.UseApplicationMessageReceivedHandler(async me =>
+                    {
+                        using var db = new PeopleContext();
+                        var msg = me.ApplicationMessage;
+                        var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
+                        await connection.StartAsync();
+                        if (item != null)
                         {
-                            using var db = new PeopleContext();
-                            var msg = me.ApplicationMessage;
-                            var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
-                            await connection.StartAsync();
-                            if (item != null)
+                            if (name == null) name = item.Name;
+                            item.Name = name;
+                            item.Type = type;
+                            item.Data = Encoding.UTF8.GetString(msg.Payload);
+                            await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+                        }
+                        else
+                        {
+                            if (name == null) name = "Lamp";
+                            var parameter = new Parameter
                             {
-                                if (name == null) name = item.Name;
-                                item.Name = name;
-                                item.Type = type;
-                                item.Data = Encoding.UTF8.GetString(msg.Payload);
-                                await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
-                            }
-                            else
+                                Name = name,
+                                Type = type,
+                                Data = Encoding.UTF8.GetString(msg.Payload),
+                                Topic = msg.Topic
+                            };
+                            db.Add(parameter);
+                            var item2 = GetParameters();
+                            if (item2 != null)
                             {
-                                if (name == null) name = "Lamp";
-                                var parameter = new Parameter
+                                for (int i = 0; i < item2.Count; i++)
                                 {
-                                    Name = name,
-                                    Type = type,
-                                    Data = Encoding.UTF8.GetString(msg.Payload),
-                                    Topic = msg.Topic
-                                };
-                                db.Add(parameter);
-                                await connection.SendAsync("MqttSync", "add", parameter.Id, parameter.DeviseId, parameter.Name, parameter.Topic, parameter.Data, parameter.Type);
-                            }
-                            db.SaveChanges();
-                        });
-                        break;
-                    default:
-                        throw new Exception(result[0].ResultCode.ToString());
-                }
+                                    if (item2[i].Topic == msg.Topic)
+                                    {
+                                        await connection.SendAsync("MqttSync", "add", item2[i].Id, item2[i].DeviseId, item2[i].Name, item2[i].Topic, item2[i].Data, item2[i].Type);
+                                    }
+                                }
+                            }  
+                        }
+                        db.SaveChanges();
+                    });
+                    break;
+                default:
+                    throw new Exception(result[0].ResultCode.ToString());
             }
         }
-        [HttpGet("GetParameters")]
-        public List<Parameter> GetParameters()
-        {
-            using var db = new PeopleContext();
-            return db.Parameters.Select(x => new Parameter
-            {
-                Id = x.Id,
-                Data = x.Data,
-                DeviseId = x.DeviseId,
-                Name = x.Name,
-                Topic = x.Topic,
-            }).ToList();
-        }
         [HttpGet("Delete")]
-        public void Delete(int? id)
+        public async void Delete(int? id)
         {
+            await connection.StartAsync();
+
             using var db = new PeopleContext();
             var deleteOrderDetails =
                 from details in db.Parameters
@@ -132,7 +127,24 @@ namespace CPanel.Controllers
                 db.Parameters.Remove(detail);
             }
             db.SaveChanges();
+            await connection.SendAsync("MqttSync", "delete", id, null, "null", "null", "null");
         }
+        [HttpGet("GetParameters")]
+        public List<Parameter> GetParameters()
+        {
+            using var db = new PeopleContext();
+            var response = db.Parameters.Select(x => new Parameter
+            {
+                Id = x.Id,
+                Data = x.Data,
+                DeviseId = x.DeviseId,
+                Name = x.Name,
+                Topic = x.Topic,
+                Type = x.Type 
+            }).ToList();
+            return response;
+        }
+        
         [HttpGet("GetDevices")]
         public List<Device> GetDevices()
         {

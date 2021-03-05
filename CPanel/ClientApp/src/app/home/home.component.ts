@@ -31,29 +31,26 @@ export class HomeComponent implements OnInit {
   }
   ngOnInit() {
     this.start();
-    this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, name: string, topic: string, data: string, type: string) => {
-      console.log(action);
-      console.log(id);
-      console.log(deviseId);
-      console.log(name);
-      console.log(topic);
-      console.log(data);
+    this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, name: string, topic: string, data: number, type: string) => {
+      var item: Parameter;
+      item = { id, deviseId, name, topic, data, type };
       switch (action) {
         case "update":
+          console.log(this.response);
+
           for (var i = 0; i < this.response.length; i++) {
             if (this.response[i]["id"] == id) {
-              this.response[i]["deviseId"] = deviseId;
-              this.response[i]["name"] = name;
-              this.response[i]["topic"] = topic;
-              this.response[i]["data"] = data;
-              this.response[i]["type"] = type;
+              this.response[i] = item;
             }
           }
         case "add":
-          var item: Parameter;
-          item = { id, deviseId, name, topic, data, type };
-          console.log(item);
           this.response.push(item);
+        case "delete":
+          for (var i = 0; i < this.response.length; i++) {
+            if (this.response[i]["id"] == id) {
+              this.response.pop();
+            }
+          }
         default:
           break;
       }
@@ -125,7 +122,7 @@ interface Parameter {
   deviseId: number;
   name: string;
   topic: string;
-  data: string;
+  data: number;
   type: string;
 }
 
@@ -136,11 +133,11 @@ interface Parameter {
 export class DialogElementsExampleDialog {
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData, @Inject('BASE_URL') baseUrl: string, private _snackBar: MatSnackBar) { }
   public Add() {
+    var type = "button";
     var topic = <HTMLInputElement>document.getElementById("topic");
     var name = <HTMLInputElement>document.getElementById("name");
-    var type = <HTMLInputElement>document.getElementById("type");
     console.log(topic.value);
-    var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&type" + type.value + "&name=" + name.value);
+    var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&type" + type + "&name=" + name.value);
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {
