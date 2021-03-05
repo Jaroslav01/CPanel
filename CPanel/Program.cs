@@ -10,6 +10,9 @@ namespace CPanel
     {
         public static void Main(string[] args)
         {
+            MqttController mqttController = new MqttController();
+            Thread thread1 = new Thread(mqttController.UpdateDataAsync);
+            thread1.Start();
             CreateHostBuilder(args).Build().Run();
         }
         public static IHostBuilder CreateHostBuilder(string[] args) =>

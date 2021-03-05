@@ -16,6 +16,8 @@ using CPanel.Hubs;
 //using Microsoft.AspNet.SignalR.Client;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Threading;
+using System.Net;
+using System.Net.Http;
 
 namespace CPanel.Controllers
 {
@@ -24,8 +26,8 @@ namespace CPanel.Controllers
     public class MqttController : ControllerBase
     {
         public readonly HubConnection connection = new HubConnectionBuilder()
-                    .WithUrl("https://localhost:5001/Hub")
-                    //.WithUrl("https://localhost:44333/Hub")
+                    //.WithUrl("https://localhost:5001/Hub")
+                    .WithUrl("https://localhost:44333/Hub")
                     .WithAutomaticReconnect()
                    .Build();
 
@@ -103,7 +105,7 @@ namespace CPanel.Controllers
                                         await connection.SendAsync("MqttSync", "add", item2[i].Id, item2[i].DeviseId, item2[i].Name, item2[i].Topic, item2[i].Data, item2[i].Type);
                                     }
                                 }
-                            }  
+                            }
                         }
                         db.SaveChanges();
                     });
@@ -140,11 +142,11 @@ namespace CPanel.Controllers
                 DeviseId = x.DeviseId,
                 Name = x.Name,
                 Topic = x.Topic,
-                Type = x.Type 
+                Type = x.Type
             }).ToList();
             return response;
         }
-        
+
         [HttpGet("GetDevices")]
         public List<Device> GetDevices()
         {
@@ -168,26 +170,23 @@ namespace CPanel.Controllers
             Thread newThread = new Thread(mqttController.UpdateDataAsync);
             newThread.Start();
         }*/
-        public async Task UpdateDataAsync()
+        public async void UpdateDataAsync()
         {
+            using var httpClient = new HttpClient();
+
             using var db = new PeopleContext();
             while (true)
             {
-                var parameters = db.Parameters.Select(x => new Parameter
-                {
-                    Id = x.Id,
-                    Data = x.Data,
-                    DeviseId = x.DeviseId,
-                    Name = x.Name,
-                    Topic = x.Topic
-                }).ToList();
+                var parameters = GetParameters();
                 foreach (var parameter in parameters)
                 {
-                    await Update(parameter.Topic);
+                    httpClient.GetStringAsync(
+                       $"https://localhost:44333/mqtt/update?topic={parameter.Topic}")
+                       .GetAwaiter().GetResult();
                     Thread.Sleep(1000);
                 }
             }
         }
-
     }
+
 }
