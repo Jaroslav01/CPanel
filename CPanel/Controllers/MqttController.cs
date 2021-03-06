@@ -26,8 +26,8 @@ namespace CPanel.Controllers
     public class MqttController : ControllerBase
     {
         public readonly HubConnection connection = new HubConnectionBuilder()
-                    //.WithUrl("https://localhost:5001/Hub")
-                    .WithUrl("https://localhost:44333/Hub")
+                    .WithUrl("https://localhost:5001/Hub")
+                    //.WithUrl("https://localhost:44333/Hub")
                     .WithAutomaticReconnect()
                    .Build();
 
@@ -100,7 +100,7 @@ namespace CPanel.Controllers
                             {
                                 for (int i = 0; i < item2.Count; i++)
                                 {
-                                    if (item2[i].Topic == msg.Topic)
+                                    if (item2[i].Topic == topic)
                                     {
                                         await connection.SendAsync("MqttSync", "add", item2[i].Id, item2[i].DeviseId, item2[i].Name, item2[i].Topic, item2[i].Data, item2[i].Type);
                                     }
@@ -164,13 +164,7 @@ namespace CPanel.Controllers
             }).ToList();
         }
         [HttpGet("UpdateDataAsync")]
-        /*public void S()
-        {
-            MqttController mqttController = new MqttController();
-            Thread newThread = new Thread(mqttController.UpdateDataAsync);
-            newThread.Start();
-        }*/
-        public async void UpdateDataAsync()
+        public void UpdateDataAsync()
         {
             using var httpClient = new HttpClient();
 
@@ -180,13 +174,10 @@ namespace CPanel.Controllers
                 var parameters = GetParameters();
                 foreach (var parameter in parameters)
                 {
-                    httpClient.GetStringAsync(
-                       $"https://localhost:44333/mqtt/update?topic={parameter.Topic}")
-                       .GetAwaiter().GetResult();
-                    Thread.Sleep(1000);
+                    httpClient.GetStringAsync($"https://localhost:5001/mqtt/update?topic={parameter.Topic}");
+                    Thread.Sleep(500);
                 }
             }
         }
     }
-
 }

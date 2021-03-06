@@ -36,8 +36,11 @@
         <button (click)="drawer.toggle()" mat-icon-button aria-label="Example icon button with a vertical three dot icon">
           <mat-icon>settings</mat-icon>
         </button>
+        <mat-slide-toggle class="example-margin"
+                          [checked]="responses.data">
+          {{responses.data}}
+        </mat-slide-toggle>
         
-        {{responses.data}}
       </div>
     </div>
   </div>
