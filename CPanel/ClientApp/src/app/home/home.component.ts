@@ -17,6 +17,7 @@ export class HomeComponent implements OnInit {
   value = 'Clear me';
   public connection = new signalR.HubConnectionBuilder()
     .withUrl("/hub")
+    .withAutomaticReconnect()
     .build();
   public currentCount = 0;
   public i = 1;
@@ -33,31 +34,28 @@ export class HomeComponent implements OnInit {
     this.start();
     this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, name: string, topic: string, data: number, type: string) => {
       var item: Parameter;
-      item = { id, deviseId, name, topic, data, type };
-      console.log(item);
-      switch (action) {
-        case "update":
-          for (var i = 0; i < this.response.length; i++) {
-            if (this.response[i]["id"] == id) {
-              this.response[i]["deviseId"] = deviseId;
-              this.response[i]["name"] = name;
-              this.response[i]["topic"] = topic;
-              this.response[i]["data"] = data;
-              this.response[i]["type"] = type;
-            }
+      if (action == "update") {
+        for (var i = 0; i < this.response.length; i++) {
+          if (this.response[i]["id"] == id) {
+            this.response[i]["deviseId"] = deviseId;
+            this.response[i]["name"] = name;
+            this.response[i]["topic"] = topic;
+            this.response[i]["data"] = data;
+            this.response[i]["type"] = type;
           }
-            break;
-        case "add":
-          this.response.push(item);
-          break;
-        case "delete":
-          for (var i = 0; i < this.response.length; i++) {
-            if (this.response[i]["id"] == id) {
-              this.response.pop();
-            }
+        }
+      }
+      else if (action == "add") {
+        var item: Parameter;
+        item = { id, deviseId, name, topic, data, type };
+        this.response.push(item);
+      }
+      else if (action == "delete") {
+        for (var i = 0; i < this.response.length; i++) {
+          if (this.response[i]["id"] == id) {
+            delete this.response;
           }
-        default:
-          break;
+        }
       }
     });
   }
