@@ -14,6 +14,7 @@ using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
 using CPanel.Hubs;
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Threading;
 
 namespace CPanel.Controllers
 {
@@ -104,6 +105,8 @@ namespace CPanel.Controllers
                             }
                         }
                         db.SaveChanges();
+                         Client.DisconnectAsync();
+                         connection.StopAsync();
                     });
                     break;
                 default:
@@ -167,7 +170,8 @@ namespace CPanel.Controllers
                 var parameters = GetParameters();
                 foreach (var parameter in parameters)
                 {
-                      await Update(topic:parameter.Topic);
+                    await Update(topic:parameter.Topic);
+                    Thread.Sleep(1000);
                 }
             }
         }

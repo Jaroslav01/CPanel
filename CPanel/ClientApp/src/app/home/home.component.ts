@@ -17,6 +17,7 @@ export class HomeComponent implements OnInit {
   value = 'Clear me';
   public connection = new signalR.HubConnectionBuilder()
     .withUrl("/hub")
+    .withAutomaticReconnect()
     .build();
   public currentCount = 0;
   public i = 1;
@@ -56,6 +57,7 @@ export class HomeComponent implements OnInit {
               this.response.pop();
             }
           }
+          break;
         default:
           break;
       }
