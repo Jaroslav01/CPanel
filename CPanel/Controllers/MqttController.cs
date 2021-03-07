@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿    using Microsoft.AspNetCore.Mvc;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Connecting;
@@ -13,11 +13,7 @@ using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
 using CPanel.Hubs;
-//using Microsoft.AspNet.SignalR.Client;
 using Microsoft.AspNetCore.SignalR.Client;
-using System.Threading;
-using System.Net;
-using System.Net.Http;
 
 namespace CPanel.Controllers
 {
@@ -146,7 +142,6 @@ namespace CPanel.Controllers
             }).ToList();
             return response;
         }
-
         [HttpGet("GetDevices")]
         public List<Device> GetDevices()
         {
@@ -164,18 +159,15 @@ namespace CPanel.Controllers
             }).ToList();
         }
         [HttpGet("UpdateDataAsync")]
-        public void UpdateDataAsync()
+        public async Task UpdateDataAsync()
         {
-            using var httpClient = new HttpClient();
-
             using var db = new PeopleContext();
             while (true)
             {
                 var parameters = GetParameters();
                 foreach (var parameter in parameters)
                 {
-                    httpClient.GetStringAsync($"https://localhost:5001/mqtt/update?topic={parameter.Topic}");
-                    Thread.Sleep(500);
+                      await Update(topic:parameter.Topic);
                 }
             }
         }

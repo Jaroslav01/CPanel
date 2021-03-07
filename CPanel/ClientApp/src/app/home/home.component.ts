@@ -34,17 +34,22 @@ export class HomeComponent implements OnInit {
     this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, name: string, topic: string, data: number, type: string) => {
       var item: Parameter;
       item = { id, deviseId, name, topic, data, type };
+      console.log(item);
       switch (action) {
         case "update":
-          console.log(this.response);
-
           for (var i = 0; i < this.response.length; i++) {
             if (this.response[i]["id"] == id) {
-              this.response[i] = item;
+              this.response[i]["deviseId"] = deviseId;
+              this.response[i]["name"] = name;
+              this.response[i]["topic"] = topic;
+              this.response[i]["data"] = data;
+              this.response[i]["type"] = type;
             }
           }
+            break;
         case "add":
           this.response.push(item);
+          break;
         case "delete":
           for (var i = 0; i < this.response.length; i++) {
             if (this.response[i]["id"] == id) {

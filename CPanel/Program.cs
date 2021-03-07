@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 
 namespace CPanel
 {
@@ -11,19 +12,16 @@ namespace CPanel
         public static void Main(string[] args)
         {
             MqttController mqttController = new MqttController();
-            Thread thread1 = new Thread(mqttController.UpdateDataAsync);
-            thread1.Start();
+            
+
             CreateHostBuilder(args).Build().Run();
+            Task.Run(mqttController.UpdateDataAsync);
         }
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                })
-                /*.ConfigureServices(services =>
-                {
-                    services.AddHostedService<VideosWatcher>();
-                })*/;
+                });
     }
 }
