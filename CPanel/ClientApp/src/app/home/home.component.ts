@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit {
   public i = 1;
   public topic: string;
   public response: Parameter[];
-  public res: Parameter[];
+  public res: Parameter[]; 
     constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
     http.get<Parameter[]>(baseUrl + 'mqtt/GetParameters').subscribe(result => {
       this.response = result;

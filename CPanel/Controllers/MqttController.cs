@@ -171,7 +171,7 @@ namespace CPanel.Controllers
                 foreach (var parameter in parameters)
                 {
                     await Update(topic:parameter.Topic);
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
                 }
             }
         }
