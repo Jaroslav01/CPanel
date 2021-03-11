@@ -28,10 +28,6 @@ namespace CPanel.Controllers
                     .WithAutomaticReconnect()
                    .Build();
 
-        public async void Start15()
-        {
-            await connection.StartAsync();
-        }
         public IMqttClient Client { get; private set; }
         public MqttClientAuthenticateResult Auth { get; private set; }
         public async Task Connect(string ip, string port, string login, string password)
@@ -60,6 +56,7 @@ namespace CPanel.Controllers
             var result = (await Client.SubscribeAsync(
                          new TopicFilterBuilder()
                          .WithTopic(topic)
+                         .
                          .Build()
                      )).Items.ToList();
             switch (result[0].ResultCode)
@@ -164,16 +161,11 @@ namespace CPanel.Controllers
         [HttpGet("UpdateDataAsync")]
         public async Task UpdateDataAsync()
         {
-            using var db = new PeopleContext();
-            while (true)
-            {
                 var parameters = GetParameters();
                 foreach (var parameter in parameters)
                 {
                     await Update(topic:parameter.Topic);
-                    Thread.Sleep(1000);
                 }
-            }
         }
     }
 }
