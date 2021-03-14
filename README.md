@@ -22,7 +22,7 @@ https://mosquitto.org/files/binary/win32/mosquitto-2.0.9-install-windows-x86.exe
 ## Mac
 Mosquitto can be installed from the homebrew project. See brew.sh and then use brew install mosquitto<br>
 
-Linux distributions with snap support<br>
+## Linux distributions with snap support
 >snap install mosquitto
 ## Debian
 https://mosquitto.org/2013/01/mosquitto-debian-repository<br>
