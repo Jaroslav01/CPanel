@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit {
   public i = 1;
   public topic: string;
   public response: Parameter[];
-  public res: Parameter[];
+  public res: Parameter[]; 
     constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
     http.get<Parameter[]>(baseUrl + 'mqtt/GetParameters').subscribe(result => {
       this.response = result;
@@ -34,32 +34,28 @@ export class HomeComponent implements OnInit {
     this.start();
     this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, name: string, topic: string, data: number, type: string) => {
       var item: Parameter;
-      item = { id, deviseId, name, topic, data, type };
-      console.log(item);
-      switch (action) {
-        case "update":
-          for (var i = 0; i < this.response.length; i++) {
-            if (this.response[i]["id"] == id) {
-              this.response[i]["deviseId"] = deviseId;
-              this.response[i]["name"] = name;
-              this.response[i]["topic"] = topic;
-              this.response[i]["data"] = data;
-              this.response[i]["type"] = type;
-            }
+      if (action == "update") {
+        for (var i = 0; i < this.response.length; i++) {
+          if (this.response[i]["id"] == id) {
+            this.response[i]["deviseId"] = deviseId;
+            this.response[i]["name"] = name;
+            this.response[i]["topic"] = topic;
+            this.response[i]["data"] = data;
+            this.response[i]["type"] = type;
           }
-            break;
-        case "add":
-          this.response.push(item);
-          break;
-        case "delete":
-          for (var i = 0; i < this.response.length; i++) {
-            if (this.response[i]["id"] == id) {
-              this.response.pop();
-            }
+        }
+      }
+      else if (action == "add") {
+        var item: Parameter;
+        item = { id, deviseId, name, topic, data, type };
+        this.response.push(item);
+      }
+      else if (action == "delete") {
+        for (var i = 0; i < this.response.length; i++) {
+          if (this.response[i]["id"] == id) {
+            delete this.response;
           }
-          break;
-        default:
-          break;
+        }
       }
     });
   }
