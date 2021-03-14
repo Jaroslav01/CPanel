@@ -18,7 +18,7 @@ using CPanel.Controllers;
 
 namespace CPanel.MqttServer
 {
-    public class MqttServerClient : ControllerBase
+    public class MqttServerClient
     {
 
         HubConnection connection = new HubConnectionBuilder()
@@ -41,10 +41,14 @@ namespace CPanel.MqttServer
             do
             {
                 Auth = await Client.ConnectAsync(options);
+                if(Client.IsConnected != true)
+                await Task.Delay(1000);
             } while (Client.IsConnected != true);
             do
             {
                 await connection.StartAsync();
+                if(connection.State != HubConnectionState.Connected)
+                await Task.Delay(1000);
             } while (connection.State != HubConnectionState.Connected);
         }
         public async Task Send(string topic, string data)
@@ -84,8 +88,7 @@ namespace CPanel.MqttServer
         }
         public async Task GetTopicsForSubscribe()
         {
-            var mqttController = new MqttController();
-            var parametersList = mqttController.GetParameters();
+            var parametersList = GetParameters();
             var topicList = new List<string>();
             for (int i = 0; i < parametersList.Count; i++)
             {
@@ -108,6 +111,20 @@ namespace CPanel.MqttServer
                 )).Items[0];
                 Result.Add(resultItems);
             }
+        }
+        public List<Parameter> GetParameters()
+        {
+            using var db = new PeopleContext();
+            var response = db.Parameters.Select(x => new Parameter
+            {
+                Id = x.Id,
+                Data = x.Data,
+                DeviseId = x.DeviseId,
+                Name = x.Name,
+                Topic = x.Topic,
+                Type = x.Type
+            }).ToList();
+            return response;
         }
     }
 }

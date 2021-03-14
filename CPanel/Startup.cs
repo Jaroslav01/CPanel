@@ -48,11 +48,13 @@ namespace CPanel
 
             });
             services.AddSignalR();
+            services.AddSingleton<MqttServerClient, MqttServerClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var mqttServerClient = app.ApplicationServices.GetService<MqttServerClient>();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -96,7 +98,7 @@ namespace CPanel
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
-            Task.Run(StartMqtt);
+            Task.Run(async () => await StartMqtt(mqttServerClient));
             //Task.Run(StartSignalR);
         }
         /*private async Task StartSignalR() {
@@ -107,11 +109,9 @@ namespace CPanel
             } while (chatHub.connection.State != HubConnectionState.Connected);
             
         }*/
-        private async Task StartMqtt()
+        private async Task StartMqtt(MqttServerClient mqttServerClient)
         {
-            var mqttController = new MqttController();
-            var mqttServerClient = new MqttServerClient();
-            var ParametersList = mqttController.GetParameters();
+            var ParametersList = mqttServerClient.GetParameters();
             var topicList = new List<string>();
             await mqttServerClient.Connect(
                 Configuration["Mqtt:ip"],

@@ -27,8 +27,12 @@ namespace CPanel.Controllers
                 .WithUrl("https://localhost:5001/hub")
                 .WithAutomaticReconnect()
                 .Build();
-        private ChatHub chatHub = new ChatHub();
-        private MqttServerClient mqttServerClient = new MqttServerClient();
+        private MqttServerClient mqttServerClient;
+        public MqttController(MqttServerClient mqttServerClient)
+        {
+            this.mqttServerClient = mqttServerClient;
+        }
+
         [HttpGet("Set")]
         public async Task Send(string topic, string value)
         {

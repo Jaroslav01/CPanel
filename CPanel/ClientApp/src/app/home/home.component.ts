@@ -55,8 +55,8 @@ export class HomeComponent implements OnInit {
       }
       else if (action == "delete") {
         for (var i = 0; i < this.response.length; i++) {
-          if (this.response[i]["id"] == id) {
-            this.response.splice(i, 1);
+          if (this.response[i]["id"] == id) {            
+            this.response = this.response.splice(i, 1);
           }
         }
       }
