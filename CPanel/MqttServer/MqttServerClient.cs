@@ -25,7 +25,7 @@ namespace CPanel.MqttServer
         public MqttClientAuthenticateResult Auth { get; set; }
         public List<MqttClientSubscribeResultItem> Result { get; set; } = new List<MqttClientSubscribeResultItem>();
         public async Task Connect(string ip, string port, string login, string password)
-        {
+        { 
             Client = new MqttFactory().CreateMqttClient();
             IMqttClientOptions options = new MqttClientOptionsBuilder()
                             .WithTcpServer(ip, int.Parse(port))
