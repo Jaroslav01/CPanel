@@ -32,15 +32,18 @@ export class HomeComponent implements OnInit {
   }
   ngOnInit() {
     this.start();
-    this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, name: string, topic: string, data: number, type: string) => {
+    this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, name: string, topic: string, data: string, type: string) => {
       var item: Parameter;
+      console.log(action)
       if (action == "update") {
         for (var i = 0; i < this.response.length; i++) {
           if (this.response[i]["id"] == id) {
             this.response[i]["deviseId"] = deviseId;
             this.response[i]["name"] = name;
             this.response[i]["topic"] = topic;
-            this.response[i]["data"] = data;
+
+                this.response[i]["data"] = Boolean(Number(data));
+            
             this.response[i]["type"] = type;
           }
         }
@@ -53,7 +56,7 @@ export class HomeComponent implements OnInit {
       else if (action == "delete") {
         for (var i = 0; i < this.response.length; i++) {
           if (this.response[i]["id"] == id) {
-            delete this.response;
+            this.response.splice(i, 1);
           }
         }
       }
@@ -82,22 +85,21 @@ export class HomeComponent implements OnInit {
       }
     }); 
 }
-  public OnOff2(topic2: string) {
-    this.currentCount++;
-    this.i = 1;
-    if (this.currentCount % 2 == 0) { this.i = 0; }
-    else { this.i = 1; }
-    var request = new Request(getBaseUrl() + "mqtt/set?topic=" + topic2 + "&value=" + this.i);
+  public OnOff(topic: string, value:any) {
+    
+    var request = new Request(getBaseUrl() + "mqtt/set?topic=" + topic + "&value=" + Number(value));
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {
-      console.log(text.substring(0, 30));
+      console.log(document.getElementById("mqtt/set?topic=" + topic + "&value=" + Number(value)));
     });
+    this.openSnackBar("Updated", "Hide");
   }
   public Update(id: string) {
     var topic = <HTMLInputElement>document.getElementById(id + "topic");
     var name = <HTMLInputElement>document.getElementById(id + "name");
-var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&name=" + name.value);
+    var type: string;
+    var request = new Request(getBaseUrl() + "mqtt/UpdateParameter?id=" + id + "&name=" + name.value + "&type" + type);
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {
@@ -125,7 +127,7 @@ interface Parameter {
   deviseId: number;
   name: string;
   topic: string;
-  data: number;
+  data: any;
   type: string;
 }
 
@@ -136,7 +138,7 @@ interface Parameter {
 export class DialogElementsExampleDialog {
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData, @Inject('BASE_URL') baseUrl: string, private _snackBar: MatSnackBar) { }
   public Add() {
-    var type = "button";
+    var type:string;
     var topic = <HTMLInputElement>document.getElementById("topic");
     var name = <HTMLInputElement>document.getElementById("name");
     console.log(topic.value);

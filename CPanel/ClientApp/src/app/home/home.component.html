@@ -17,6 +17,14 @@
         <mat-option *ngFor="let respons of response" id="{{respons.id}}select" value="{{respons.id}}">{{respons.id}}:{{respons.name}}</mat-option>
       </mat-select>
     </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Select control type</mat-label>
+      <mat-select [(value)]="type">
+        <mat-option>None</mat-option>
+        <mat-option value="button">Button</mat-option>
+        <mat-option value="slider">Slider</mat-option>
+      </mat-select>
+    </mat-form-field>
     <button (click)="Update(responses.id)" mat-icon-button aria-label="Example icon button with a vertical three dot icon" style="bottom: 0px; right: 0px;margin: 5%; position: absolute;">
       <mat-icon>save</mat-icon>
     </button>
@@ -37,10 +45,12 @@
           <mat-icon>settings</mat-icon>
         </button>
         <mat-slide-toggle class="example-margin"
-                          [checked]="responses.data">
-          {{responses.data}}
+                          [checked]="responses.data"
+                          (click)="OnOff(responses.topic, responses.data)">
         </mat-slide-toggle>
-        
+        {{responses.data}}
+        <!-- <mat-slider *ngIf="responses.type == 'slider'" min="0" max="255" step="10" value="responses.data"></mat-slider>-->
+
       </div>
     </div>
   </div>

@@ -35,9 +35,9 @@ namespace CPanel.Controllers
             await mqttServerClient.Send(topic, value);
         }
         [HttpGet("Delete")]
-        public async void Delete(int? id)
+        public async void Delete(int id)
         {
-            await chatHub.connection.StartAsync();
+            await connection.StartAsync();
 
             using var db = new PeopleContext();
             var deleteOrderDetails =
@@ -47,9 +47,9 @@ namespace CPanel.Controllers
             foreach (var detail in deleteOrderDetails)
             {
                 db.Parameters.Remove(detail);
+                //await connection.SendAsync("MqttSync", "delete", detail.Id, detail.DeviseId , detail.Name, detail.Topic, detail.Data, detail.Type);
             }
             db.SaveChanges();
-            await chatHub.connection.SendAsync("MqttSync", "delete", id, null, "null", "null", "null");
         }
         [HttpGet("GetParameters")]
         public List<Parameter> GetParameters()
@@ -83,6 +83,23 @@ namespace CPanel.Controllers
             await db.SaveChangesAsync();
             var item = db.Parameters.FirstOrDefault(x => x.Topic == topic);
             await connection.SendAsync("MqttSync", "add", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+        }
+        [HttpGet("UpdateParameter")]
+        public async void UpdateParameter(int id, string name, string type)
+        {
+            while (connection.State != HubConnectionState.Connected) await connection.StartAsync();
+            var mqttServerClient = new MqttServerClient();
+            using var db = new PeopleContext();
+            var item = db.Parameters.FirstOrDefault(x => x.Id == id);
+            item = new Parameter
+            {
+                Name = name,
+                Type = type
+            };
+            await mqttServerClient.GetTopicsForSubscribe();
+            await db.AddAsync(item);
+            await db.SaveChangesAsync();
+            await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
         }
     }
 }
