@@ -14,29 +14,27 @@ CPanel/CPanel/appsettings.json<br>
 cd Cpanel
 >dotnet run
 
+## Install Mqtt Broker
+### Windows<br>
+https://mosquitto.org/files/binary/win64/mosquitto-2.0.9-install-windows-x64.exe (64-bit)<br>
+https://mosquitto.org/files/binary/win32/mosquitto-2.0.9-install-windows-x86.exe (32-bit)<br>
 
-Install Mqtt Broker
-Windows
-mosquitto-2.0.9-install-windows-x64.exe (64-bit build, Windows Vista and up, built with Visual Studio Community 2019)
-mosquitto-2.0.9-install-windows-x32.exe (32-bit build, Windows Vista and up, built with Visual Studio Community 2019)
-Older installers can be found at https://mosquitto.org/files/binary/.
+## Mac
+Mosquitto can be installed from the homebrew project. See brew.sh and then use brew install mosquitto<br>
 
-See also README-windows.md after installing.
+Linux distributions with snap support<br>
+>snap install mosquitto
+## Debian
+https://mosquitto.org/2013/01/mosquitto-debian-repository<br>
+## Raspberry Pi
+Mosquitto is available through the main repository.<br>
 
-Mac
-Mosquitto can be installed from the homebrew project. See brew.sh and then use brew install mosquitto
+There are also Debian repositories provided by the mosquitto project, as described at https://mosquitto.org/2013/01/mosquitto-debian-repository/<br>
 
-Linux distributions with snap support
-snap install mosquitto
-Debian
-Mosquitto is now in Debian proper. There will be a short delay between a new release and it appearing in Debian as part of the normal Debian procedures.
-There are also Debian repositories provided by the mosquitto project, as described at https://mosquitto.org/2013/01/mosquitto-debian-repository
-Raspberry Pi
-Mosquitto is available through the main repository.
+## Ubuntu
+Mosquitto is available in the Ubuntu repositories so you can install as with any other package.<br>
+ If you are on an earlier version of Ubuntu or want a more recent version of mosquitto, <br>
+add the mosquitto-dev PPA to your repositories list - see the link for details.<br>
+ mosquitto can then be installed from your package manager.<br>
 
-There are also Debian repositories provided by the mosquitto project, as described at https://mosquitto.org/2013/01/mosquitto-debian-repository/
-
-Ubuntu
-Mosquitto is available in the Ubuntu repositories so you can install as with any other package. If you are on an earlier version of Ubuntu or want a more recent version of mosquitto, add the mosquitto-dev PPA to your repositories list - see the link for details. mosquitto can then be installed from your package manager.
-
-sudo apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
+>sudo apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
