@@ -83,7 +83,7 @@ namespace CPanel
                 endpoints.MapHub<ChatHub>("/hub");
 
             });
-            
+
             app.UseSpa(spa =>
             {
                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
@@ -97,18 +97,16 @@ namespace CPanel
                 }
             });
             Task.Run(StartMqtt);
-            Task.Run(StartSignalR);
+            //Task.Run(StartSignalR);
         }
-        private async Task StartSignalR() {
-
+        /*private async Task StartSignalR() {
             var chatHub = new ChatHub();
             do
             {
                 await chatHub.connection.StartAsync();
             } while (chatHub.connection.State != HubConnectionState.Connected);
             
-
-        }
+        }*/
         private async Task StartMqtt()
         {
             var mqttController = new MqttController();
@@ -124,14 +122,7 @@ namespace CPanel
             {
                 topicList.Add(parameter.Topic);
             }
-            if (mqttServerClient.Auth.ResultCode != MqttClientConnectResultCode.Success)
-            {
-                throw new Exception(mqttServerClient.Auth.ResultCode.ToString());
-            }
-            else
-            {
-                await mqttServerClient.Subscribe(topicList);
-            }
+            await mqttServerClient.Subscribe(topicList);
             await Task.Run(mqttServerClient.WaitForReciveMessage);
         }
     }

@@ -28,7 +28,7 @@ namespace CPanel.Controllers
         [HttpGet("Set")]
         public async Task Send(string topic, string value)
         {
-            mqttServerClient.Send(topic, value);
+            await mqttServerClient.Send(topic, value);
         }
         [HttpGet("Delete")]
         public async void Delete(int? id)
