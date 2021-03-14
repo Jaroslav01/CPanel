@@ -85,11 +85,15 @@ namespace CPanel.MqttServer
         public async Task GetTopicsForSubscribe()
         {
             var mqttController = new MqttController();
-            var ParametersList = mqttController.GetParameters();
+            var parametersList = mqttController.GetParameters();
             var topicList = new List<string>();
-            foreach (var parameter in ParametersList)
+            for (int i = 0; i < parametersList.Count; i++)
             {
-                topicList.Add(parameter.Topic);
+                for (int j = 0; j < Result.Count; j++)
+                {
+                    if (parametersList[i].Topic == Result[j].ResultCode.ToString()) continue;
+                    topicList.Add(parametersList[i].Topic);
+                }
             }
             await Subscribe(topicList);
         }

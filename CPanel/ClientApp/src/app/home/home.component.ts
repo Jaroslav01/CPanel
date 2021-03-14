@@ -140,7 +140,7 @@ export class DialogElementsExampleDialog {
     var topic = <HTMLInputElement>document.getElementById("topic");
     var name = <HTMLInputElement>document.getElementById("name");
     console.log(topic.value);
-    var request = new Request(getBaseUrl() + "mqtt/update?topic=" + topic.value + "&type" + type + "&name=" + name.value);
+    var request = new Request(getBaseUrl() + "mqtt/AddParameter?topic=" + topic.value + "&type" + type + "&name=" + name.value);
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {

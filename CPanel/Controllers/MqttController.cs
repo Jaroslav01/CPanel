@@ -23,6 +23,10 @@ namespace CPanel.Controllers
     [Route("[controller]")]
     public class MqttController : ControllerBase
     {
+        HubConnection connection = new HubConnectionBuilder()
+                .WithUrl("https://localhost:5001/hub")
+                .WithAutomaticReconnect()
+                .Build();
         private ChatHub chatHub = new ChatHub();
         private MqttServerClient mqttServerClient = new MqttServerClient();
         [HttpGet("Set")]
@@ -62,21 +66,23 @@ namespace CPanel.Controllers
             }).ToList();
             return response;
         }
-        [HttpGet("GetDevices")]
-        public List<Device> GetDevices()
+        [HttpGet("AddParameter")]
+        public async void AddParameter(string name, string topic, string type)
         {
+            while (connection.State != HubConnectionState.Connected) await connection.StartAsync();
+            var mqttServerClient = new MqttServerClient();
             using var db = new PeopleContext();
-            return db.Devices.Select(x => new Device
+            var parameter = new Parameter
             {
-                Id = x.Id,
-                Name = x.Name,
-                Topic = x.Topic,
-                Ip = x.Ip,
-                Mac = x.Mac,
-                Rssi = x.Rssi,
-                Uptime = x.Uptime,
-                State = x.State
-            }).ToList();
+                Name = name,
+                Topic = topic,
+                Type = type
+            };
+            await mqttServerClient.GetTopicsForSubscribe();
+            await db.AddAsync(parameter);
+            await db.SaveChangesAsync();
+            var item = db.Parameters.FirstOrDefault(x => x.Topic == topic);
+            await connection.SendAsync("MqttSync", "add", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
         }
     }
 }
