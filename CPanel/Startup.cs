@@ -97,9 +97,9 @@ namespace CPanel
                 }
             });
             Task.Run(StartMqtt);
-            Task.Run(StartSignalR);
+            //Task.Run(StartSignalR);
         }
-        private async Task StartSignalR() {
+        /*private async Task StartSignalR() {
 
             var chatHub = new ChatHub();
             do
@@ -108,7 +108,7 @@ namespace CPanel
             } while (chatHub.connection.State != HubConnectionState.Connected);
             
 
-        }
+        }*/
         private async Task StartMqtt()
         {
             var mqttController = new MqttController();
@@ -124,14 +124,7 @@ namespace CPanel
             {
                 topicList.Add(parameter.Topic);
             }
-            if (mqttServerClient.Auth.ResultCode != MqttClientConnectResultCode.Success)
-            {
-                throw new Exception(mqttServerClient.Auth.ResultCode.ToString());
-            }
-            else
-            {
-                await mqttServerClient.Subscribe(topicList);
-            }
+            await mqttServerClient.Subscribe(topicList);
             await Task.Run(mqttServerClient.WaitForReciveMessage);
         }
     }

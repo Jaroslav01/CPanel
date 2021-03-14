@@ -23,17 +23,21 @@ namespace CPanel.Controllers
     [Route("[controller]")]
     public class MqttController : ControllerBase
     {
+        HubConnection connection;
         private ChatHub chatHub = new ChatHub();
         private MqttServerClient mqttServerClient = new MqttServerClient();
         [HttpGet("Set")]
-        public async Task Send(string topic, string value)
+        public async void Send(string topic, string value)
         {
-            mqttServerClient.Send(topic, value);
+            await mqttServerClient.Send(topic, value);
         }
         [HttpGet("Delete")]
         public async void Delete(int? id)
         {
-            await chatHub.connection.StartAsync();
+            connection = new HubConnectionBuilder()
+                .WithUrl("http://localhost:5001/Hub")
+                .Build();
+            await connection.StartAsync();
 
             using var db = new PeopleContext();
             var deleteOrderDetails =
@@ -45,7 +49,7 @@ namespace CPanel.Controllers
                 db.Parameters.Remove(detail);
             }
             db.SaveChanges();
-            await chatHub.connection.SendAsync("MqttSync", "delete", id, null, "null", "null", "null");
+            await connection.SendAsync("MqttSync", "delete", id, null, "null", "null", "null");
         }
         [HttpGet("GetParameters")]
         public List<Parameter> GetParameters()
@@ -61,22 +65,6 @@ namespace CPanel.Controllers
                 Type = x.Type
             }).ToList();
             return response;
-        }
-        [HttpGet("GetDevices")]
-        public List<Device> GetDevices()
-        {
-            using var db = new PeopleContext();
-            return db.Devices.Select(x => new Device
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Topic = x.Topic,
-                Ip = x.Ip,
-                Mac = x.Mac,
-                Rssi = x.Rssi,
-                Uptime = x.Uptime,
-                State = x.State
-            }).ToList();
         }
     }
 }

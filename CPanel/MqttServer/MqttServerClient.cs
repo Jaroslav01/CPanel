@@ -14,20 +14,26 @@ using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
 using Microsoft.AspNetCore.SignalR.Client;
+using CPanel.Controllers;
 
 namespace CPanel.MqttServer
 {
     public class MqttServerClient : ControllerBase
     {
-        private ChatHub chatHub = new ChatHub();
+
+        HubConnection connection = new HubConnectionBuilder()
+                .WithUrl("https://localhost:5001/hub")
+                .WithAutomaticReconnect()
+                .Build();
+        IMqttClientOptions options;
         private PeopleContext db = new PeopleContext();
-        public IMqttClient Client { get; set; }
-        public MqttClientAuthenticateResult Auth { get; set; }
+        private IMqttClient Client { get; set; }
+        public MqttClientAuthenticateResult Auth { get; private set; } = new MqttClientAuthenticateResult();
         public List<MqttClientSubscribeResultItem> Result { get; set; } = new List<MqttClientSubscribeResultItem>();
         public async Task Connect(string ip, string port, string login, string password)
         {
             Client = new MqttFactory().CreateMqttClient();
-            IMqttClientOptions options = new MqttClientOptionsBuilder()
+            options = new MqttClientOptionsBuilder()
                             .WithTcpServer(ip, int.Parse(port))
                             .WithCredentials(login, password)
                             .WithProtocolVersion(MqttProtocolVersion.V311)
@@ -36,6 +42,10 @@ namespace CPanel.MqttServer
             {
                 Auth = await Client.ConnectAsync(options);
             } while (Client.IsConnected != true);
+            do
+            {
+                await connection.StartAsync();
+            } while (connection.State != HubConnectionState.Connected);
         }
         public async Task Send(string topic, string data)
         {
@@ -43,10 +53,6 @@ namespace CPanel.MqttServer
         }
         public async Task WaitForReciveMessage()
         {
-            do
-            {
-                await chatHub.connection.StartAsync();
-            } while (chatHub.connection.State != HubConnectionState.Connected);
             while (true)
             {
                 for (int i = 0; i < Result.Count; i++)
@@ -62,8 +68,9 @@ namespace CPanel.MqttServer
                                 var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
                                 if (item != null)
                                 {
+                                    connection.StartAsync();
                                     item.Data = Encoding.UTF8.GetString(msg.Payload);
-                                    chatHub.connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+                                    connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
                                 }
                                 db.SaveChanges();
                             });
@@ -73,6 +80,17 @@ namespace CPanel.MqttServer
                     }
                 }
             }
+        }
+        public async Task GetTopicsForSubscribe()
+        {
+            var mqttController = new MqttController();
+            var ParametersList = mqttController.GetParameters();
+            var topicList = new List<string>();
+            foreach (var parameter in ParametersList)
+            {
+                topicList.Add(parameter.Topic);
+            }
+            await Subscribe(topicList);
         }
         public async Task Subscribe(List<string> topicList)
         {

@@ -12,10 +12,6 @@ namespace CPanel.Hubs
 {
     public class ChatHub : Hub
     {
-        public HubConnection connection { get; set; } = new HubConnectionBuilder()
-                    .WithUrl("https://localhost:5001/Hub")
-                    .WithAutomaticReconnect()
-                   .Build();
         public async Task NewMessage(long username, string message)
         {
             await Clients.All.SendAsync("messageReceived", username, message);
