@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.SignalR.Client;
 using Microsoft.AspNetCore.SignalR;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
+using Microsoft.AspNetCore.SignalR.Client;
 
 
 namespace CPanel.Hubs
 {
     public class ChatHub : Hub
     {
+        public HubConnection connection { get; set; } = new HubConnectionBuilder()
+                    .WithUrl("https://localhost:5001/Hub")
+                    .WithAutomaticReconnect()
+                   .Build();
         public async Task NewMessage(long username, string message)
         {
             await Clients.All.SendAsync("messageReceived", username, message);

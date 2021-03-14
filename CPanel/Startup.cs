@@ -11,11 +11,16 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using MQTTnet.Formatter;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
+using CPanel.MqttServer;
+using System;
+using MQTTnet.Client.Connecting;
+using CPanel.Controllers;
 
 namespace CPanel
 {
@@ -78,7 +83,7 @@ namespace CPanel
                 endpoints.MapHub<ChatHub>("/hub");
 
             });
-            Task.Run(Initialize);
+            
             app.UseSpa(spa =>
             {
                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
@@ -91,78 +96,43 @@ namespace CPanel
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+            Task.Run(StartMqtt);
+            Task.Run(StartSignalR);
+        }
+        private async Task StartSignalR() {
+
+            var chatHub = new ChatHub();
+            do
+            {
+                await chatHub.connection.StartAsync();
+            } while (chatHub.connection.State != HubConnectionState.Connected);
+            
 
         }
-        public async Task Initialize()
+        private async Task StartMqtt()
         {
-            var ip = "176.36.127.144";
-            var port = "1883";
-            var login = "yaroslav";
-            var password = "220977qQ";
-            var client = new MqttFactory().CreateMqttClient();
-            var connection = new HubConnectionBuilder()
-                    .WithUrl("https://localhost:5001/Hub")
-                    .WithAutomaticReconnect()
-                   .Build();
-            string topic = "yaroslav/Kitchen/output0";
-            string type = "slider";
-            string name = "Kitchen/output0";
-            IMqttClientOptions options = new MqttClientOptionsBuilder()
-                .WithTcpServer(ip, int.Parse(port))
-                .WithCredentials(login, password)
-                .WithProtocolVersion(MqttProtocolVersion.V311)
-                .Build();
-           var Auth = await client.ConnectAsync(options);
-            client.SubscribeAsync();
-            client.UseApplicationMessageReceivedHandler(async me =>
+            var mqttController = new MqttController();
+            var mqttServerClient = new MqttServerClient();
+            var ParametersList = mqttController.GetParameters();
+            var topicList = new List<string>();
+            await mqttServerClient.Connect(
+                Configuration["Mqtt:ip"],
+                Configuration["Mqtt:port"],
+                Configuration["Mqtt:login"],
+                Configuration["Mqtt:password"]);
+            foreach (var parameter in ParametersList)
             {
-                using var db = new PeopleContext();
-                var msg = me.ApplicationMessage;
-                var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
-                await connection.StartAsync();
-                if (item != null)
-                {
-                    if (name == null) name = item.Name;
-                    item.Name = name;
-                    item.Type = type;
-                    item.Data = Encoding.UTF8.GetString(msg.Payload);
-                    await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
-                }
-                else
-                {
-                    if (name == null) name = "Lamp";
-                    var parameter = new Parameter
-                    {
-                        Name = name,
-                        Type = type,
-                        Data = Encoding.UTF8.GetString(msg.Payload),
-                        Topic = msg.Topic
-                    };
-                    db.Add(parameter);
-                    var item2 =  db.Parameters.Select(x => new Parameter
-                    {
-                        Id = x.Id,
-                        Data = x.Data,
-                        DeviseId = x.DeviseId,
-                        Name = x.Name,
-                        Topic = x.Topic,
-                        Type = x.Type
-                    }).ToList();
-                    if (item2 != null)
-                    {
-                        for (int i = 0; i < item2.Count; i++)
-                        {
-                            if (item2[i].Topic == topic)
-                            {
-                                await connection.SendAsync("MqttSync", "add", item2[i].Id, item2[i].DeviseId, item2[i].Name, item2[i].Topic, item2[i].Data, item2[i].Type);
-                            }
-                        }
-                    }
-                }
-                db.SaveChanges();
-                //await client.DisconnectAsync();
-                //await connection.StopAsync();
-            });
+                topicList.Add(parameter.Topic);
+            }
+            if (mqttServerClient.Auth.ResultCode != MqttClientConnectResultCode.Success)
+            {
+                throw new Exception(mqttServerClient.Auth.ResultCode.ToString());
+            }
+            else
+            {
+                await mqttServerClient.Subscribe(topicList);
+            }
+            await Task.Run(mqttServerClient.WaitForReciveMessage);
         }
     }
 }

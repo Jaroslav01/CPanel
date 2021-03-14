@@ -40,15 +40,20 @@
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
     <Content Remove="$(SpaRoot)**" />
     <Content Remove="Client\**" />
+    <Content Remove="Mqtt\**" />
     <None Remove="$(SpaRoot)**" />
     <None Remove="Client\**" />
+    <None Remove="Mqtt\**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Client\**" />
+    <Compile Remove="Mqtt\**" />
     <EmbeddedResource Remove="Client\**" />
+    <EmbeddedResource Remove="Mqtt\**" />
     <TypeScriptCompile Remove="Client\**" />
+    <TypeScriptCompile Remove="Mqtt\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,10 +66,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\USQLCSharp\USQLCSharp.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Mqtt\" />
   </ItemGroup>
 
   <ItemGroup>
