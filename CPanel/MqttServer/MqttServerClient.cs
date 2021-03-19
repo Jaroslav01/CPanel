@@ -17,13 +17,13 @@ namespace CPanel.MqttServer
 {
     public class MqttServerClient
     {
-        HubConnection connection = new HubConnectionBuilder()
+        public HubConnection connection = new HubConnectionBuilder()
                 .WithUrl("https://localhost:5001/hub")
                 .WithAutomaticReconnect()
                 .Build();
         IMqttClientOptions options;
         private PeopleContext db = new PeopleContext();
-        private IMqttClient Client { get; set; }
+        public IMqttClient Client { get; set; }
         public MqttClientAuthenticateResult Auth { get; private set; } = new MqttClientAuthenticateResult();
         public List<MqttClientSubscribeResultItem> Result { get; set; } = new List<MqttClientSubscribeResultItem>();
         public async Task Connect(string ip, string port, string login, string password)

@@ -36,7 +36,13 @@ namespace CPanel.Controllers
         [HttpGet("Set")]
         public async Task Send(string topic, string value)
         {
-            await mqttServerClient.Send(topic, value);
+            var messagePayload = new MqttApplicationMessageBuilder()
+            .WithTopic(topic) //"yaroslav/TableLamp/output16"
+            .WithPayload(value) //"0"
+            .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
+            .WithRetainFlag()
+            .Build();
+            await mqttServerClient.Client.PublishAsync(messagePayload, CancellationToken.None);
         }
         [HttpGet("Delete")]
         public async void Delete(int id)

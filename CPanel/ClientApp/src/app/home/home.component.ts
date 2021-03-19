@@ -85,13 +85,13 @@ export class HomeComponent implements OnInit {
       }
     }); 
 }
-  public OnOff(topic: string, value:any) {
+  public OnOff(topic: string, value:string) {
     
-    var request = new Request(getBaseUrl() + "mqtt/set?topic=" + topic + "&value=" + Number(value));
+    var request = new Request(getBaseUrl() + "mqtt/set?topic=" + topic + "&value=" + value);
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {
-      console.log(document.getElementById("mqtt/set?topic=" + topic + "&value=" + Number(value)));
+      console.log(document.getElementById("mqtt/set?topic=" + topic + "&value=" + value));
     });
     this.openSnackBar("Updated", "Hide");
   }
