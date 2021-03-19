@@ -104,7 +104,9 @@ namespace CPanel.Controllers
             item.Name = name;
             item.Type = type;
             await db.SaveChangesAsync();
-            await mqttServerClient.AddTopicsForSubscribe();
+            var topicList = new List<string>();
+            topicList.Add(item.Topic);
+            mqttServerClient.Subscribe(topicList);
             await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
         }
     }
