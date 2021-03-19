@@ -21,6 +21,7 @@ using CPanel.MqttServer;
 using System;
 using MQTTnet.Client.Connecting;
 using CPanel.Controllers;
+using CPanel.SignalR;
 
 namespace CPanel
 {
@@ -49,12 +50,14 @@ namespace CPanel
             });
             services.AddSignalR();
             services.AddSingleton<MqttServerClient, MqttServerClient>();
+            services.AddSingleton<Client, Client>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             var mqttServerClient = app.ApplicationServices.GetService<MqttServerClient>();
+            var client = app.ApplicationServices.GetService<Client>();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -99,16 +102,7 @@ namespace CPanel
                 }
             });
             Task.Run(async () => await StartMqtt(mqttServerClient));
-            //Task.Run(StartSignalR);
         }
-        /*private async Task StartSignalR() {
-            var chatHub = new ChatHub();
-            do
-            {
-                await chatHub.connection.StartAsync();
-            } while (chatHub.connection.State != HubConnectionState.Connected);
-            
-        }*/
         private async Task StartMqtt(MqttServerClient mqttServerClient)
         {
             var ParametersList = mqttServerClient.GetParameters();

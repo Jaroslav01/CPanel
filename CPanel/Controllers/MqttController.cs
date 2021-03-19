@@ -16,6 +16,7 @@ using CPanel.Hubs;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Threading;
 using CPanel.MqttServer;
+using CPanel.SignalR;
 
 namespace CPanel.Controllers
 {
@@ -32,7 +33,6 @@ namespace CPanel.Controllers
         {
             this.mqttServerClient = mqttServerClient;
         }
-
         [HttpGet("Set")]
         public async Task Send(string topic, string value)
         {
@@ -82,9 +82,9 @@ namespace CPanel.Controllers
                 Topic = topic,
                 Type = type
             };
-            await mqttServerClient.GetTopicsForSubscribe();
             await db.AddAsync(parameter);
             await db.SaveChangesAsync();
+            await mqttServerClient.AddTopicsForSubscribe();
             var item = db.Parameters.FirstOrDefault(x => x.Topic == topic);
             await connection.SendAsync("MqttSync", "add", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
         }
@@ -95,14 +95,10 @@ namespace CPanel.Controllers
             var mqttServerClient = new MqttServerClient();
             using var db = new PeopleContext();
             var item = db.Parameters.FirstOrDefault(x => x.Id == id);
-            item = new Parameter
-            {
-                Name = name,
-                Type = type
-            };
-            await mqttServerClient.GetTopicsForSubscribe();
-            await db.AddAsync(item);
+            item.Name = name;
+            item.Type = type;
             await db.SaveChangesAsync();
+            await mqttServerClient.AddTopicsForSubscribe();
             await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
         }
     }

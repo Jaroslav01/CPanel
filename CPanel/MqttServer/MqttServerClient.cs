@@ -1,6 +1,4 @@
-﻿using CPanel.Hubs;
-using Microsoft.AspNetCore.Mvc;
-using MQTTnet;
+﻿using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Options;
@@ -14,13 +12,11 @@ using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
 using Microsoft.AspNetCore.SignalR.Client;
-using CPanel.Controllers;
 
 namespace CPanel.MqttServer
 {
     public class MqttServerClient
     {
-
         HubConnection connection = new HubConnectionBuilder()
                 .WithUrl("https://localhost:5001/hub")
                 .WithAutomaticReconnect()
@@ -86,7 +82,7 @@ namespace CPanel.MqttServer
                 }
             }
         }
-        public async Task GetTopicsForSubscribe()
+        public async Task AddTopicsForSubscribe()
         {
             var parametersList = GetParameters();
             var topicList = new List<string>();
