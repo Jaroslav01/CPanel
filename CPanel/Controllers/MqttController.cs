@@ -50,14 +50,12 @@ namespace CPanel.Controllers
             await connection.StartAsync();
 
             using var db = new PeopleContext();
-            var deleteOrderDetails =
-                from details in db.Parameters
-                where details.Id == id
-                select details;
+            var deleteOrderDetails = db.Parameters.Where(x => x.Id == id);
             foreach (var detail in deleteOrderDetails)
             {
                 db.Parameters.Remove(detail);
-                //await connection.SendAsync("MqttSync", "delete", detail.Id, detail.DeviseId , detail.Name, detail.Topic, detail.Data, detail.Type);
+                await mqttServerClient.Unsubscribe(detail.Topic);
+                await connection.SendAsync("MqttSync", "delete", detail.Id, detail.DeviseId , detail.Name, detail.Topic, detail.Data, detail.Type);
             }
             db.SaveChanges();
         }

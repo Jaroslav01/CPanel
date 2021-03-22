@@ -2,8 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { getBaseUrl } from 'src/main';
 import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import * as signalR from "@microsoft/signalr";
+import {
+  MatSnackBar,
+  MatSnackBarHorizontalPosition,
+  MatSnackBarVerticalPosition,
+} from '@angular/material/snack-bar';
 
 export interface DialogData {
   animal: 'panda' | 'unicorn' | 'lion';
@@ -55,8 +59,8 @@ export class HomeComponent implements OnInit {
       }
       else if (action == "delete") {
         for (var i = 0; i < this.response.length; i++) {
-          if (this.response[i]["id"] == id) {            
-            this.response = this.response.splice(i, 1);
+          if (this.response[i]["id"] == id) {
+            this.response.splice(i, 1);
           }
         }
       }
@@ -107,16 +111,13 @@ export class HomeComponent implements OnInit {
     });
     this.openSnackBar("Updated", "Hide");
   }
-  public Delete(id: number) {
+  public Delete(id: string) {
     var name = <HTMLInputElement>document.getElementById(id + "name");
 
     var request = new Request(getBaseUrl() + "mqtt/Delete?id=" + id);
     fetch(request).then(function (response) {
       return response.text();
     }).then(function (text) {
-    });
-    this.connection.on("mqttsyncres", (response: Parameter[]) => {
-      this.response = response;
     });
     this.openSnackBar("Deleted " + name.value, "Hide");
   }
@@ -152,7 +153,7 @@ export class DialogElementsExampleDialog {
   }
   public openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
-      duration: 2000,
+      duration: 1000,
     });
   }
 }

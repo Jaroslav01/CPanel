@@ -108,6 +108,15 @@ namespace CPanel.MqttServer
                 Result.Add(resultItems);
             }
         }
+        public async Task Unsubscribe(string topic)
+        {
+            MqttClientSubscribeResultItem resultItems = (await Client.SubscribeAsync(
+                    new TopicFilterBuilder()
+                    .WithTopic(topic)
+                    .Build()
+                )).Items[0];
+            Result.Remove(resultItems);
+        }
         public List<Parameter> GetParameters()
         {
             using var db = new PeopleContext();
