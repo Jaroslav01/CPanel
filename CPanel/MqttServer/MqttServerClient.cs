@@ -22,7 +22,6 @@ namespace CPanel.MqttServer
                 .WithAutomaticReconnect()
                 .Build();
         IMqttClientOptions options;
-        private PeopleContext db = new PeopleContext();
         public IMqttClient Client { get; set; }
         public MqttClientAuthenticateResult Auth { get; private set; } = new MqttClientAuthenticateResult();
         public List<MqttClientSubscribeResultItem> Result { get; set; } = new List<MqttClientSubscribeResultItem>();
@@ -55,6 +54,7 @@ namespace CPanel.MqttServer
         {
             while (true)
             {
+                var db = new PeopleContext();
                 for (int i = 0; i < Result.Count; i++)
                 {
                     switch (Result[i].ResultCode)
