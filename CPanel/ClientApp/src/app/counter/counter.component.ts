@@ -2,7 +2,6 @@ import * as signalR from "@microsoft/signalr";
 
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
-import { getBaseUrl } from 'src/main';
 
 @Component({
   selector: 'app-counter',
@@ -14,7 +13,7 @@ export class CounterComponent {
   public connection = new signalR.HubConnectionBuilder()
     .withUrl("/hub")
     .build();
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+  constructor(http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
     this.start();
     var divMessages = <HTMLDivElement>document.getElementById("divMessages");
     var tbMessage = <HTMLInputElement>document.getElementById("tbMessage");

@@ -8,7 +8,6 @@ import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent, DialogElementsExampleDialog } from './home/home.component';
 
-import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { CounterComponent } from './counter/counter.component';
 import { PanelComponent } from './panel/panel.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -34,7 +33,6 @@ import * as signalR from "@microsoft/signalr";
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    FetchDataComponent,
     PanelComponent,
     DialogElementsExampleDialog,
     CounterComponent,
@@ -56,7 +54,6 @@ import * as signalR from "@microsoft/signalr";
     MatSlideToggleModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'fetch-data', component: FetchDataComponent },
       { path: 'counter', component: CounterComponent },
       { path: 'panel', component: PanelComponent },
     ]),
