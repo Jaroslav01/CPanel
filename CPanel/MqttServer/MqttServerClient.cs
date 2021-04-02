@@ -33,18 +33,22 @@ namespace CPanel.MqttServer
                             .WithCredentials(login, password)
                             .WithProtocolVersion(MqttProtocolVersion.V311)
                             .Build();
-            do
+            while (true)
             {
-                Auth = await Client.ConnectAsync(options);
-                if(Client.IsConnected != true)
-                await Task.Delay(1000);
-            } while (Client.IsConnected != true);
-            do
-            {
-                await connection.StartAsync();
-                if(connection.State != HubConnectionState.Connected)
-                await Task.Delay(1000);
-            } while (connection.State != HubConnectionState.Connected);
+                while (Client.IsConnected != true)
+                {
+                    Auth = await Client.ConnectAsync(options);
+                    if (Client.IsConnected != true)
+                        await Task.Delay(1000);
+                }
+                while (connection.State != HubConnectionState.Connected)
+                {
+                    await connection.StartAsync();
+                    if (connection.State != HubConnectionState.Connected)
+                        await Task.Delay(1000);
+                }
+                await Task.Delay(5000);
+            }
         }
         public async Task Send(string topic, string data)
         {

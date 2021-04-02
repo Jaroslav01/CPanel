@@ -27,7 +27,7 @@ export class HomeComponent implements OnInit {
   public topic: string;
   public response: Parameter[];
   public res: Parameter[]; 
-    constructor(http: HttpClient, @Inject('BASE_URL') public baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
+    constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
     http.get<Parameter[]>(baseUrl + 'mqtt/GetParameters').subscribe(result => {
       this.response = result;
       console.log(this.response);
@@ -44,9 +44,7 @@ export class HomeComponent implements OnInit {
             this.response[i]["deviseId"] = deviseId;
             this.response[i]["name"] = name;
             this.response[i]["topic"] = topic;
-
-                this.response[i]["data"] = Number(data);
-            
+                this.response[i]["data"] = Boolean(Number(data));
             this.response[i]["type"] = type;
           }
         }
@@ -87,37 +85,32 @@ export class HomeComponent implements OnInit {
         animal: 'panda'
       }
     }); 
-}
-  public OnOff(topic: string, value:string) {
-
-    var request = new Request(this.baseUrl + "mqtt/set?topic=" + topic + "&value=" + value);
-    fetch(request).then(function (response) {
-      return response.text();
-    }).then(function (text) {
-      console.log(document.getElementById("mqtt/set?topic=" + topic + "&value=" + value));
-    });
+  }
+  public OnOff(topic: string, value: Boolean) {
+    this.http.get<any>(this.baseUrl + "mqtt/set?topic=" + topic + "&value=" + !value).toPromise()
+      .then(function (response) {
+        return response.text();
+      });
     this.openSnackBar("Updated", "Hide");
   }
   public Update(id: string) {
-    var topic = <HTMLInputElement>document.getElementById(id + "topic");
     var name = <HTMLInputElement>document.getElementById(id + "name");
     var type: string;
-    var request = new Request(this.baseUrl + "mqtt/UpdateParameter?id=" + id + "&name=" + name.value + "&type" + type);
-    fetch(request).then(function (response) {
+    this.http.get<any>(this.baseUrl + "mqtt/UpdateParameter?id=" + id + "&name=" + name.value + "&type=" + type).toPromise()
+      .then(function (response) {
+        this.openSnackBar("Updated", "Hide");
       return response.text();
-    }).then(function (text) {
-      console.log(document.getElementById(id + "topic"));
-    });
-    this.openSnackBar("Updated", "Hide");
+      }).then(function (text) {
+        this.openSnackBar("Error", "Hide");
+        return text();
+      });
   }
   public Delete(id: string) {
     var name = <HTMLInputElement>document.getElementById(id + "name");
-
-    var request = new Request(this.baseUrl + "mqtt/Delete?id=" + id);
-    fetch(request).then(function (response) {
-      return response.text();
-    }).then(function (text) {
-    });
+    this.http.get<any>(this.baseUrl + "mqtt/Delete?id=" + id).toPromise()
+      .then(function (response) {
+        return response.text();
+      });
     this.openSnackBar("Deleted " + name.value, "Hide");
   }
 }
@@ -136,18 +129,15 @@ interface Parameter {
   templateUrl: 'dialog-data-example-dialog.html',
 })
 export class DialogElementsExampleDialog {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData, @Inject('BASE_URL') public baseUrl: string, private _snackBar: MatSnackBar) { }
+  constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string, private _snackBar: MatSnackBar) { }
   public Add() {
     var type:string;
     var topic = <HTMLInputElement>document.getElementById("topic");
     var name = <HTMLInputElement>document.getElementById("name");
-    console.log(topic.value);
-    var request = new Request(this.baseUrl + "mqtt/AddParameter?topic=" + topic.value + "&type" + type + "&name=" + name.value);
-    fetch(request).then(function (response) {
-      return response.text();
-    }).then(function (text) {
-      console.log(document.getElementById("topic"));
-    });
+    this.http.get<any>(this.baseUrl + "mqtt/AddParameter?topic=" + topic.value + "&type" + type + "&name=" + name.value).toPromise()
+      .then(function (response) {
+        return response.text();
+      });
     this.openSnackBar("Saccesfull add " + name.value, "Hide");
   }
   public openSnackBar(message: string, action: string) {
