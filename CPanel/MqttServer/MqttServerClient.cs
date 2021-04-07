@@ -21,35 +21,10 @@ namespace CPanel.MqttServer
                 .WithUrl("https://localhost:5001/hub")
                 .WithAutomaticReconnect()
                 .Build();
-        IMqttClientOptions options;
+        public IMqttClientOptions options;
         public IMqttClient Client { get; set; }
-        public MqttClientAuthenticateResult Auth { get; private set; } = new MqttClientAuthenticateResult();
+        public MqttClientAuthenticateResult Auth { get; set; } = new MqttClientAuthenticateResult();
         public List<MqttClientSubscribeResultItem> Result { get; set; } = new List<MqttClientSubscribeResultItem>();
-        public async Task Connect(string ip, string port, string login, string password)
-        {
-            Client = new MqttFactory().CreateMqttClient();
-            options = new MqttClientOptionsBuilder()
-                            .WithTcpServer(ip, int.Parse(port))
-                            .WithCredentials(login, password)
-                            .WithProtocolVersion(MqttProtocolVersion.V311)
-                            .Build();
-            while (true)
-            {
-                while (Client.IsConnected != true)
-                {
-                    Auth = await Client.ConnectAsync(options);
-                    if (Client.IsConnected != true)
-                        await Task.Delay(1000);
-                }
-                while (connection.State != HubConnectionState.Connected)
-                {
-                    await connection.StartAsync();
-                    if (connection.State != HubConnectionState.Connected)
-                        await Task.Delay(1000);
-                }
-                await Task.Delay(5000);
-            }
-        }
         public async Task Send(string topic, string data)
         {
             await Client.PublishAsync(topic, data);

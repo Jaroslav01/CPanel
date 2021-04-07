@@ -1,5 +1,10 @@
 ﻿using CPanel.MqttServer;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
+using MQTTnet;
+using MQTTnet.Client;
+using MQTTnet.Client.Options;
+using MQTTnet.Formatter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,25 +23,60 @@ namespace CPanel
             this.mqttServerClient = mqttServerClient;
             Configuration = configuration;
         }
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        private async Task StartMqtt()
         {
-            Console.WriteLine("MyServiceA is starting.");
-
+            mqttServerClient.Client = new MqttFactory().CreateMqttClient();
+            mqttServerClient.options = new MqttClientOptionsBuilder()
+                            .WithTcpServer(Configuration["Mqtt:ip"], int.Parse(Configuration["Mqtt:port"]))
+                            .WithCredentials(Configuration["Mqtt:login"], Configuration["Mqtt:password"])
+                            .WithProtocolVersion(MqttProtocolVersion.V311)
+                            .Build();
+            while (true)
+            {
+                while (mqttServerClient.Client.IsConnected != true)
+                {
+                    mqttServerClient.Auth = await mqttServerClient.Client.ConnectAsync(mqttServerClient.options);
+                    if (mqttServerClient.Client.IsConnected != true)
+                        await Task.Delay(1000);
+                }
+                await Task.Delay(5000);
+            }
+        }
+        private async Task StartSignalR()
+        {
+            while (true)
+            {
+                while (mqttServerClient.connection.State != HubConnectionState.Connected)
+                {
+                    await mqttServerClient.connection.StartAsync();
+                    if (mqttServerClient.connection.State != HubConnectionState.Connected)
+                        await Task.Delay(1000);
+                }
+                await Task.Delay(5000);
+            }
+        }
+        private async Task StartSubscribe()
+        {
             var ParametersList = mqttServerClient.GetParameters();
             var topicList = new List<string>();
-            await mqttServerClient.Connect(
-                Configuration["Mqtt:ip"],
-                Configuration["Mqtt:port"],
-                Configuration["Mqtt:login"],
-                Configuration["Mqtt:password"]);
             foreach (var parameter in ParametersList)
             {
                 topicList.Add(parameter.Topic);
             }
             await mqttServerClient.Subscribe(topicList);
-            System.Diagnostics.Debug.WriteLine("Mqtt is started");
-            await Task.Run(mqttServerClient.WaitForReciveMessage);
-            System.Diagnostics.Debug.WriteLine("SignalR is started");
+        }
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            Console.WriteLine("MyServiceA is starting.");
+
+            _ = Task.Run(async () => await StartMqtt(), stoppingToken);
+            Console.WriteLine("Mqtt is started");
+            _ = Task.Run(async () => await StartSignalR(), stoppingToken);
+            Console.WriteLine("SignalR is started");
+            _ = Task.Run(async () => await StartSubscribe(), stoppingToken);
+            Console.WriteLine("Mqtt is started");
+            _ = Task.Run(mqttServerClient.WaitForReciveMessage, stoppingToken);
+            Console.WriteLine("WaitForReciveMessage is started");
 
             stoppingToken.Register(() => Console.WriteLine("MyServiceA is stopping."));
 
