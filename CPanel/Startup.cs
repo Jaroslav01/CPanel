@@ -40,6 +40,9 @@ namespace CPanel
             services.AddSignalR();
             services.AddSingleton<MqttServerClient, MqttServerClient>();
             services.AddSingleton<Client, Client>();
+            //services.AddHostedService<BackgroundService>();
+            services.AddHostedService<MyServiceA>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -90,23 +93,6 @@ namespace CPanel
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
-            Task.Run(async () => await StartMqtt(mqttServerClient));
-        }
-        private async Task StartMqtt(MqttServerClient mqttServerClient)
-        {
-            var ParametersList = mqttServerClient.GetParameters();
-            var topicList = new List<string>();
-            await mqttServerClient.Connect(
-                Configuration["Mqtt:ip"],
-                Configuration["Mqtt:port"],
-                Configuration["Mqtt:login"],
-                Configuration["Mqtt:password"]);
-            foreach (var parameter in ParametersList)
-            {
-                topicList.Add(parameter.Topic);
-            }
-            await mqttServerClient.Subscribe(topicList);
-            await Task.Run(mqttServerClient.WaitForReciveMessage);
         }
     }
 }
