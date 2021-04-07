@@ -87,7 +87,13 @@ export class HomeComponent implements OnInit {
     }); 
   }
   public OnOff(topic: string, value: Boolean) {
-    this.http.get<any>(this.baseUrl + "mqtt/set?topic=" + topic + "&value=" + !value).toPromise()
+    var valueNumber: String;
+    if (!value == true) {
+      valueNumber = "1";
+    } else {
+      valueNumber = "0";
+    }
+    this.http.get<any>(this.baseUrl + "mqtt/set?topic=" + topic + "&value=" + valueNumber).toPromise()
       .then(function (response) {
         return response.text();
       });
@@ -96,7 +102,7 @@ export class HomeComponent implements OnInit {
   public Update(id: string) {
     var name = <HTMLInputElement>document.getElementById(id + "name");
     var type: string;
-    this.http.get<any>(this.baseUrl + "mqtt/UpdateParameter?id=" + id + "&name=" + name.value + "&type=" + type).toPromise()
+    var a = this.http.get<any>(this.baseUrl + "mqtt/UpdateParameter?id=" + id + "&name=" + name.value + "&type=" + type).toPromise()
       .then(function (response) {
         this.openSnackBar("Updated", "Hide");
       return response.text();

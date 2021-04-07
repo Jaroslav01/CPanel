@@ -17,6 +17,11 @@ namespace CPanel.MqttServer
 {
     public class MqttServerClient
     {
+        private readonly IServiceProvider services;
+        public MqttServerClient(IServiceProvider services)
+        {
+            this.services = services;
+        }
         public HubConnection connection = new HubConnectionBuilder()
                 .WithUrl("https://localhost:5001/hub")
                 .WithAutomaticReconnect()
@@ -29,37 +34,22 @@ namespace CPanel.MqttServer
         {
             await Client.PublishAsync(topic, data);
         }
+        private async Task MessageHendler(MqttApplicationMessageReceivedEventArgs me)
+        {
+            var db = (PeopleContext)services.GetService(typeof(PeopleContext));
+            var msg = me.ApplicationMessage;
+            var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
+            if (item != null)
+            {
+                if (msg.Payload != null)
+                    item.Data = Encoding.UTF8.GetString(msg.Payload);
+                await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+            }
+            db.SaveChanges();
+        }
         public async Task WaitForReciveMessage()
         {
-            while (true)
-            {
-                var db = new PeopleContext();
-                for (int i = 0; i < Result.Count; i++)
-                {
-                    switch (Result[i].ResultCode)
-                    {
-                        case MqttClientSubscribeResultCode.GrantedQoS0:
-                        case MqttClientSubscribeResultCode.GrantedQoS1:
-                        case MqttClientSubscribeResultCode.GrantedQoS2:
-                            Client.UseApplicationMessageReceivedHandler(me =>
-                            {
-                                var msg = me.ApplicationMessage;
-                                var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
-                                if (item != null)
-                                {
-                                    connection.StartAsync();
-                                    if (msg.Payload != null)
-                                    item.Data = Encoding.UTF8.GetString(msg.Payload);
-                                    connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
-                                }
-                                db.SaveChanges();
-                            });
-                            break;
-                        default:
-                            throw new Exception(Result[i].ResultCode.ToString());
-                    }
-                }
-            }
+            Client.UseApplicationMessageReceivedHandler(MessageHendler);
         }
         public async Task AddTopicsForSubscribe()
         {
@@ -77,6 +67,11 @@ namespace CPanel.MqttServer
         }
         public async Task Subscribe(List<string> topicList)
         {
+            var allowdTopics = new List<MqttClientSubscribeResultCode>() {
+                MqttClientSubscribeResultCode.GrantedQoS0,
+                MqttClientSubscribeResultCode.GrantedQoS1,
+                MqttClientSubscribeResultCode.GrantedQoS2
+            };
             foreach (var topic in topicList)
             {
                 MqttClientSubscribeResultItem resultItems = (await Client.SubscribeAsync(
@@ -84,7 +79,10 @@ namespace CPanel.MqttServer
                     .WithTopic(topic)
                     .Build()
                 )).Items[0];
-                Result.Add(resultItems);
+                if (!allowdTopics.Contains(resultItems.ResultCode))
+                {
+                    throw new Exception("Unsucssesful subscribtion on topic");
+                }
             }
         }
         public async Task Unsubscribe(string topic)
@@ -98,7 +96,7 @@ namespace CPanel.MqttServer
         }
         public List<Parameter> GetParameters()
         {
-            using var db = new PeopleContext();
+            var db = (PeopleContext)services.GetService(typeof(PeopleContext));
             var response = db.Parameters.Select(x => new Parameter
             {
                 Id = x.Id,

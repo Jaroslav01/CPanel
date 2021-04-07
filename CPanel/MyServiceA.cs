@@ -31,28 +31,20 @@ namespace CPanel
                             .WithCredentials(Configuration["Mqtt:login"], Configuration["Mqtt:password"])
                             .WithProtocolVersion(MqttProtocolVersion.V311)
                             .Build();
-            while (true)
+            while (mqttServerClient.Client.IsConnected != true)
             {
-                while (mqttServerClient.Client.IsConnected != true)
-                {
-                    mqttServerClient.Auth = await mqttServerClient.Client.ConnectAsync(mqttServerClient.options);
-                    if (mqttServerClient.Client.IsConnected != true)
-                        await Task.Delay(1000);
-                }
-                await Task.Delay(5000);
+                mqttServerClient.Auth = await mqttServerClient.Client.ConnectAsync(mqttServerClient.options);
+                if (mqttServerClient.Client.IsConnected != true)
+                    await Task.Delay(1000);
             }
         }
         private async Task StartSignalR()
         {
-            while (true)
+            while (mqttServerClient.connection.State != HubConnectionState.Connected)
             {
-                while (mqttServerClient.connection.State != HubConnectionState.Connected)
-                {
-                    await mqttServerClient.connection.StartAsync();
-                    if (mqttServerClient.connection.State != HubConnectionState.Connected)
-                        await Task.Delay(1000);
-                }
-                await Task.Delay(5000);
+                await mqttServerClient.connection.StartAsync();
+                if (mqttServerClient.connection.State != HubConnectionState.Connected)
+                    await Task.Delay(1000);
             }
         }
         private async Task StartSubscribe()
@@ -65,20 +57,36 @@ namespace CPanel
             }
             await mqttServerClient.Subscribe(topicList);
         }
+        private async Task ReconnectHendler()
+        {
+            mqttServerClient.Client.UseDisconnectedHandler(async e =>
+            {
+                Console.WriteLine("### DISCONNECTED FROM SERVER ###");
+                await Task.Delay(TimeSpan.FromSeconds(5));
+
+                try
+                {
+                    await mqttServerClient.Client.ConnectAsync(mqttServerClient.options, CancellationToken.None); // Since 3.0.5 with CancellationToken
+                }
+                catch
+                {
+                    Console.WriteLine("### RECONNECTING FAILED ###");
+                }
+            });
+
+        }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            Console.WriteLine("MyServiceA is starting.");
+            //Console.WriteLine("MyServiceA is starting.");
 
-            _ = Task.Run(async () => await StartMqtt(), stoppingToken);
-            Console.WriteLine("Mqtt is started");
+            await StartMqtt();
             _ = Task.Run(async () => await StartSignalR(), stoppingToken);
-            Console.WriteLine("SignalR is started");
             _ = Task.Run(async () => await StartSubscribe(), stoppingToken);
-            Console.WriteLine("Mqtt is started");
             _ = Task.Run(mqttServerClient.WaitForReciveMessage, stoppingToken);
-            Console.WriteLine("WaitForReciveMessage is started");
+            _ = Task.Run(async () => await ReconnectHendler(), stoppingToken);
 
-            stoppingToken.Register(() => Console.WriteLine("MyServiceA is stopping."));
+
+            //stoppingToken.Register(() => Console.WriteLine("MyServiceA is stopping."));
 
             while (!stoppingToken.IsCancellationRequested)
             {
