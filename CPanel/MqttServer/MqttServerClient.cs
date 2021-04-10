@@ -30,13 +30,21 @@ namespace CPanel.MqttServer
         public IMqttClient Client { get; set; }
         public MqttClientAuthenticateResult Auth { get; set; } = new MqttClientAuthenticateResult();
         public List<MqttClientSubscribeResultItem> Result { get; set; } = new List<MqttClientSubscribeResultItem>();
-        public async Task Send(string topic, string data)
+        public async Task Send(string topic, string value)
         {
-            await Client.PublishAsync(topic, data);
+            var messagePayload = new MqttApplicationMessageBuilder()
+            .WithTopic(topic) //"yaroslav/TableLamp/output16"
+            .WithPayload(value) //"0"
+            .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
+            .WithRetainFlag()
+            .Build();
+            await Client.PublishAsync(messagePayload);
         }
         private async Task MessageHendler(MqttApplicationMessageReceivedEventArgs me)
         {
-            var db = (PeopleContext)services.GetService(typeof(PeopleContext));
+            //var db = (PeopleContext)services.GetService(typeof(PeopleContext));
+            using var db = new PeopleContext();
+
             var msg = me.ApplicationMessage;
             var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
             if (item != null)
@@ -96,7 +104,9 @@ namespace CPanel.MqttServer
         }
         public List<Parameter> GetParameters()
         {
-            var db = (PeopleContext)services.GetService(typeof(PeopleContext));
+            //var db = (PeopleContext)services.GetService(typeof(PeopleContext));
+            using var db = new PeopleContext();
+
             var response = db.Parameters.Select(x => new Parameter
             {
                 Id = x.Id,

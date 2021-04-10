@@ -28,21 +28,15 @@ namespace CPanel.Controllers
                 .WithUrl("https://localhost:5001/hub")
                 .WithAutomaticReconnect()
                 .Build();
-        private MqttServerClient mqttServerClient;
+        private MqttServerClient _mqttServerClient;
         public MqttController(MqttServerClient mqttServerClient)
         {
-            this.mqttServerClient = mqttServerClient;
+            this._mqttServerClient = mqttServerClient;
         }
         [HttpGet("Set")]
         public async Task Send(string topic, string value)
         {
-            var messagePayload = new MqttApplicationMessageBuilder()
-            .WithTopic(topic) //"yaroslav/TableLamp/output16"
-            .WithPayload(value) //"0"
-            .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
-            .WithRetainFlag()
-            .Build();
-            await mqttServerClient.Client.PublishAsync(messagePayload, CancellationToken.None);
+            await _mqttServerClient.Send(topic, value);
         }
         [HttpGet("Delete")]
         public async void Delete(int id)
@@ -54,7 +48,7 @@ namespace CPanel.Controllers
             foreach (var detail in deleteOrderDetails)
             {
                 db.Parameters.Remove(detail);
-                await mqttServerClient.Unsubscribe(detail.Topic);
+                await _mqttServerClient.Unsubscribe(detail.Topic);
                 await connection.SendAsync("MqttSync", "delete", detail.Id, detail.DeviseId , detail.Name, detail.Topic, detail.Data, detail.Type);
             }
             db.SaveChanges();
@@ -78,7 +72,6 @@ namespace CPanel.Controllers
         public async void AddParameter(string name, string topic, string type)
         {
             while (connection.State != HubConnectionState.Connected) await connection.StartAsync();
-            var mqttServerClient = new MqttServerClient();
             using var db = new PeopleContext();
             var parameter = new Parameter
             {
@@ -88,7 +81,7 @@ namespace CPanel.Controllers
             };
             await db.AddAsync(parameter);
             await db.SaveChangesAsync();
-            await mqttServerClient.AddTopicsForSubscribe();
+            await _mqttServerClient.AddTopicsForSubscribe();
             var item = db.Parameters.FirstOrDefault(x => x.Topic == topic);
             await connection.SendAsync("MqttSync", "add", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
         }
@@ -96,7 +89,6 @@ namespace CPanel.Controllers
         public async void UpdateParameter(int id, string name, string type)
         {
             while (connection.State != HubConnectionState.Connected) await connection.StartAsync();
-            var mqttServerClient = new MqttServerClient();
             using var db = new PeopleContext();
             var item = db.Parameters.FirstOrDefault(x => x.Id == id);
             item.Name = name;
@@ -104,7 +96,7 @@ namespace CPanel.Controllers
             await db.SaveChangesAsync();
             var topicList = new List<string>();
             topicList.Add(item.Topic);
-            mqttServerClient.Subscribe(topicList);
+            _mqttServerClient.Subscribe(topicList);
             await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
         }
     }

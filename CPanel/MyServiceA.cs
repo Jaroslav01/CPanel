@@ -38,20 +38,11 @@ namespace CPanel
                     await Task.Delay(1000);
             }
         }
-        private async Task StartSignalR()
-        {
-            while (mqttServerClient.connection.State != HubConnectionState.Connected)
-            {
-                await mqttServerClient.connection.StartAsync();
-                if (mqttServerClient.connection.State != HubConnectionState.Connected)
-                    await Task.Delay(1000);
-            }
-        }
         private async Task StartSubscribe()
         {
-            var ParametersList = mqttServerClient.GetParameters();
+            var parametersList = mqttServerClient.GetParameters();
             var topicList = new List<string>();
-            foreach (var parameter in ParametersList)
+            foreach (var parameter in parametersList)
             {
                 topicList.Add(parameter.Topic);
             }
@@ -66,7 +57,8 @@ namespace CPanel
 
                 try
                 {
-                    await mqttServerClient.Client.ConnectAsync(mqttServerClient.options, CancellationToken.None); // Since 3.0.5 with CancellationToken
+                    await mqttServerClient.Client.ReconnectAsync(); // Since 3.0.5 with CancellationToken
+                    Console.WriteLine("### RECONNECTING SUCESSFUL ###");
                 }
                 catch
                 {
@@ -80,10 +72,10 @@ namespace CPanel
             //Console.WriteLine("MyServiceA is starting.");
 
             await StartMqtt();
-            _ = Task.Run(async () => await StartSignalR(), stoppingToken);
-            _ = Task.Run(async () => await StartSubscribe(), stoppingToken);
-            _ = Task.Run(mqttServerClient.WaitForReciveMessage, stoppingToken);
-            _ = Task.Run(async () => await ReconnectHendler(), stoppingToken);
+            await mqttServerClient.connection.StartAsync();
+            await StartSubscribe();
+            await mqttServerClient.WaitForReciveMessage();
+            await ReconnectHendler();
 
 
             //stoppingToken.Register(() => Console.WriteLine("MyServiceA is stopping."));
@@ -91,7 +83,6 @@ namespace CPanel
             while (!stoppingToken.IsCancellationRequested)
             {
                 Console.WriteLine("MyServiceA is doing background work.");
-
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
 
