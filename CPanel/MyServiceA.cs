@@ -15,49 +15,49 @@ namespace CPanel
 {
     public class MyServiceA : BackgroundService
     {
-        public IConfiguration Configuration { get; }
-        private MqttServerClient mqttServerClient;
+        public IConfiguration _configuration { get; }
+        private MqttServerClient _mqttServerClient;
 
         public MyServiceA(MqttServerClient mqttServerClient, IConfiguration configuration)
         {
-            this.mqttServerClient = mqttServerClient;
-            Configuration = configuration;
+            _mqttServerClient = mqttServerClient;
+            _configuration = configuration;
         }
         private async Task StartMqtt()
         {
-            mqttServerClient.Client = new MqttFactory().CreateMqttClient();
-            mqttServerClient.options = new MqttClientOptionsBuilder()
-                            .WithTcpServer(Configuration["Mqtt:ip"], int.Parse(Configuration["Mqtt:port"]))
-                            .WithCredentials(Configuration["Mqtt:login"], Configuration["Mqtt:password"])
+            _mqttServerClient.Client = new MqttFactory().CreateMqttClient();
+            _mqttServerClient.options = new MqttClientOptionsBuilder()
+                            .WithTcpServer(_configuration["Mqtt:ip"], int.Parse(_configuration["Mqtt:port"]))
+                            .WithCredentials(_configuration["Mqtt:login"], _configuration["Mqtt:password"])
                             .WithProtocolVersion(MqttProtocolVersion.V311)
                             .Build();
-            while (mqttServerClient.Client.IsConnected != true)
+            while (_mqttServerClient.Client.IsConnected != true)
             {
-                mqttServerClient.Auth = await mqttServerClient.Client.ConnectAsync(mqttServerClient.options);
-                if (mqttServerClient.Client.IsConnected != true)
+                _mqttServerClient.Auth = await _mqttServerClient.Client.ConnectAsync(_mqttServerClient.options);
+                if (_mqttServerClient.Client.IsConnected != true)
                     await Task.Delay(1000);
             }
         }
         private async Task StartSubscribe()
         {
-            var parametersList = mqttServerClient.GetParameters();
+            var parametersList = _mqttServerClient.GetParameters();
             var topicList = new List<string>();
             foreach (var parameter in parametersList)
             {
                 topicList.Add(parameter.Topic);
             }
-            await mqttServerClient.Subscribe(topicList);
+            await _mqttServerClient.Subscribe(topicList);
         }
         private async Task ReconnectHendler()
         {
-            mqttServerClient.Client.UseDisconnectedHandler(async e =>
+            _mqttServerClient.Client.UseDisconnectedHandler(async e =>
             {
                 Console.WriteLine("### DISCONNECTED FROM SERVER ###");
                 await Task.Delay(TimeSpan.FromSeconds(5));
 
                 try
                 {
-                    await mqttServerClient.Client.ReconnectAsync(); // Since 3.0.5 with CancellationToken
+                    await _mqttServerClient.Client.ReconnectAsync(); // Since 3.0.5 with CancellationToken
                     Console.WriteLine("### RECONNECTING SUCESSFUL ###");
                 }
                 catch
@@ -72,9 +72,9 @@ namespace CPanel
             //Console.WriteLine("MyServiceA is starting.");
 
             await StartMqtt();
-            await mqttServerClient.connection.StartAsync();
+            await _mqttServerClient.connection.StartAsync();
             await StartSubscribe();
-            await mqttServerClient.WaitForReciveMessage();
+            await _mqttServerClient.WaitForReciveMessage();
             await ReconnectHendler();
 
 

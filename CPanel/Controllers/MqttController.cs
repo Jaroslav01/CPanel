@@ -17,11 +17,13 @@ using Microsoft.AspNetCore.SignalR.Client;
 using System.Threading;
 using CPanel.MqttServer;
 using CPanel.SignalR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CPanel.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    
     public class MqttController : ControllerBase
     {
         HubConnection connection = new HubConnectionBuilder()
@@ -31,18 +33,19 @@ namespace CPanel.Controllers
         private MqttServerClient _mqttServerClient;
         public MqttController(MqttServerClient mqttServerClient)
         {
-            this._mqttServerClient = mqttServerClient;
+            _mqttServerClient = mqttServerClient;
         }
+        [Authorize(Roles = "Administrator,User")]
         [HttpGet("Set")]
-        public async Task Send(string topic, string value)
+        public async Task<IActionResult> Send(string topic, string value)
         {
             await _mqttServerClient.Send(topic, value);
+            return Ok();
         }
+        [Authorize(Roles = "Administrator,User")]
         [HttpGet("Delete")]
-        public async void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            await connection.StartAsync();
-
             using var db = new PeopleContext();
             var deleteOrderDetails = db.Parameters.Where(x => x.Id == id);
             foreach (var detail in deleteOrderDetails)
@@ -52,6 +55,7 @@ namespace CPanel.Controllers
                 await connection.SendAsync("MqttSync", "delete", detail.Id, detail.DeviseId , detail.Name, detail.Topic, detail.Data, detail.Type);
             }
             db.SaveChanges();
+            return Ok();
         }
         [HttpGet("GetParameters")]
         public List<Parameter> GetParameters()
@@ -68,8 +72,9 @@ namespace CPanel.Controllers
             }).ToList();
             return response;
         }
+        [Authorize(Roles = "Administrator,User")]
         [HttpGet("AddParameter")]
-        public async void AddParameter(string name, string topic, string type)
+        public async Task<IActionResult> AddParameter(string name, string topic, string type)
         {
             while (connection.State != HubConnectionState.Connected) await connection.StartAsync();
             using var db = new PeopleContext();
@@ -84,9 +89,11 @@ namespace CPanel.Controllers
             await _mqttServerClient.AddTopicsForSubscribe();
             var item = db.Parameters.FirstOrDefault(x => x.Topic == topic);
             await connection.SendAsync("MqttSync", "add", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+            return Ok();
         }
+        [Authorize(Roles = "Administrator,User")]
         [HttpGet("UpdateParameter")]
-        public async void UpdateParameter(int id, string name, string type)
+        public async Task<IActionResult> UpdateParameter(int id, string name, string type)
         {
             while (connection.State != HubConnectionState.Connected) await connection.StartAsync();
             using var db = new PeopleContext();
@@ -96,8 +103,9 @@ namespace CPanel.Controllers
             await db.SaveChangesAsync();
             var topicList = new List<string>();
             topicList.Add(item.Topic);
-            _mqttServerClient.Subscribe(topicList);
+            await _mqttServerClient.Subscribe(topicList);
             await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+            return Ok();
         }
     }
 }

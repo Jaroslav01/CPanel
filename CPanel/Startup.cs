@@ -6,11 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using CPanel.MqttServer;
 using CPanel.SignalR;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace CPanel
 {
@@ -42,7 +43,33 @@ namespace CPanel
             services.AddSingleton<Client, Client>();
             //services.AddHostedService<BackgroundService>();
             services.AddHostedService<MyServiceA>();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdministratorRole",
+                     policy => policy.RequireRole("Administrator"));
+                //options.AddPolicy("ElevatedRights", policy =>
+                //policy.RequireRole("Administrator", "PowerUser", "BackupAdministrator"));
+            });
+            /*
+            services.AddIdentityCore<IdentityUser>()
+                .AddRoles<IdentityRole>()
+                .AddRoleStore<PeopleContext>();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => Configuration.Bind("JwtSettings", options))
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => Configuration.Bind("CookieSettings", options));
+*/
 
+            services.AddAuthentication()
+               .AddCookie(options =>
+               {
+                   options.LoginPath = "/Account/Unauthorized/";
+                   options.AccessDeniedPath = "/Account/Forbidden/";
+               })
+               .AddJwtBearer(options =>
+               {
+                   options.Audience = "http://localhost:5001/";
+                   options.Authority = "http://localhost:5000/";
+               });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,7 +98,7 @@ namespace CPanel
             app.UseRouting();
             app.UseDefaultFiles();
             app.UseStaticFiles();
-
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -93,6 +120,7 @@ namespace CPanel
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+            app.UseAuthentication();
         }
     }
 }
