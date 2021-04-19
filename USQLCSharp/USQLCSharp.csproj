@@ -214,6 +214,10 @@
     <Compile Include="Migrations\20210302114448_addType.designer.cs">
       <DependentUpon>20210302114448_addType.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20210419191448_Person.cs" />
+    <Compile Include="Migrations\20210419191448_Person.designer.cs">
+      <DependentUpon>20210419191448_Person.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\PeopleContextModelSnapshot.cs" />
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\Device.cs" />

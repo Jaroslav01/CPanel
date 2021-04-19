@@ -1,4 +1,5 @@
 ﻿using CPanel.MqttServer;
+using CPanel.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using MQTTnet;
@@ -17,11 +18,13 @@ namespace CPanel
     {
         public IConfiguration _configuration { get; }
         private MqttServerClient _mqttServerClient;
+        private readonly SignalRClient _signalRClient;
 
-        public MyServiceA(MqttServerClient mqttServerClient, IConfiguration configuration)
+        public MyServiceA(MqttServerClient mqttServerClient, IConfiguration configuration, SignalRClient signalRClient)
         {
             _mqttServerClient = mqttServerClient;
             _configuration = configuration;
+            _signalRClient = signalRClient;
         }
         private async Task StartMqtt()
         {
@@ -72,11 +75,10 @@ namespace CPanel
             //Console.WriteLine("MyServiceA is starting.");
 
             await StartMqtt();
-            await _mqttServerClient.connection.StartAsync();
+            await _signalRClient.connection.StartAsync();
             await StartSubscribe();
             await _mqttServerClient.WaitForReciveMessage();
             await ReconnectHendler();
-
 
             //stoppingToken.Register(() => Console.WriteLine("MyServiceA is stopping."));
 

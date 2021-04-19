@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
+using IdentityServer4.Models;
 
 namespace CPanel
 {
@@ -41,7 +43,7 @@ namespace CPanel
             });
             services.AddSignalR();
             services.AddSingleton<MqttServerClient, MqttServerClient>();
-            services.AddSingleton<Client, Client>();
+            services.AddSingleton<SignalRClient, SignalRClient>();
             //services.AddHostedService<BackgroundService>();
             services.AddHostedService<MyServiceA>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -96,6 +98,7 @@ namespace CPanel
             app.UseRouting();
             app.UseDefaultFiles();
             app.UseStaticFiles();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
@@ -118,7 +121,7 @@ namespace CPanel
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
-            app.UseAuthentication();
+            
         }
     }
 }

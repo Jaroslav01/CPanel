@@ -1,8 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { HttpClientModule} from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -26,6 +26,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import * as signalR from "@microsoft/signalr";
+import { LoginComponent } from './login/login.component';
 
 
 @NgModule({
@@ -36,6 +37,8 @@ import * as signalR from "@microsoft/signalr";
     PanelComponent,
     DialogElementsExampleDialog,
     CounterComponent,
+    LoginComponent,
+
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -56,6 +59,7 @@ import * as signalR from "@microsoft/signalr";
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
       { path: 'panel', component: PanelComponent },
+      { path: 'login', component: LoginComponent },
     ]),
     BrowserAnimationsModule
   ],

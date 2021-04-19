@@ -9,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
 
 namespace CPanel.Controllers
@@ -17,13 +18,6 @@ namespace CPanel.Controllers
     [Route("[controller]")]
     public class AccountController : Controller
     {
-        // тестовые данные вместо использования базы данных
-        private List<Person> people = new List<Person>
-        {
-            new Person { Login="admin@gmail.com", Password="12345", Role = "admin" },
-            new Person { Login="qwerty@gmail.com", Password="55555", Role = "user" }
-        };
-
         [HttpPost("token")]
         public IActionResult Token(string username, string password)
         {
@@ -55,7 +49,8 @@ namespace CPanel.Controllers
 
         private ClaimsIdentity GetIdentity(string username, string password)
         {
-            Person person = people.FirstOrDefault(x => x.Login == username && x.Password == password);
+            using var _db = new PeopleContext();
+            Person person = _db.Person.FirstOrDefault(x => x.Login == username && x.Password == password);
             if (person != null)
             {
                 var claims = new List<Claim>
@@ -71,6 +66,24 @@ namespace CPanel.Controllers
 
             // если пользователя не найдено
             return null;
+        }
+        [HttpPost("registration")]
+        public IActionResult Registration(string login, string password, string firstName, string lastName)
+        {
+            using var _db = new PeopleContext();
+            var persons = _db.Person.FirstOrDefault(x => x.Login == login);
+            if(persons != null) return BadRequest(new { errorText = "Email already registered" });
+            var user = new Person
+            {
+                Login = login,
+                Password = password,
+                FirstName = firstName,
+                LastName = lastName,
+                Role = "user"
+            };
+            _db.Person.Add(user);
+            _db.SaveChanges();
+            return Ok();
         }
     }
 }

@@ -12,20 +12,19 @@ using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
 using Microsoft.AspNetCore.SignalR.Client;
+using CPanel.SignalR;
 
 namespace CPanel.MqttServer
 {
     public class MqttServerClient
     {
         private readonly IServiceProvider services;
-        public MqttServerClient(IServiceProvider services)
+        private readonly SignalRClient _signalRClient;
+        public MqttServerClient(IServiceProvider services, SignalRClient signalRClient)
         {
             this.services = services;
+            _signalRClient = signalRClient;
         }
-        public HubConnection connection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:5001/hub")
-                .WithAutomaticReconnect()
-                .Build();
         public IMqttClientOptions options;
         public IMqttClient Client { get; set; }
         public MqttClientAuthenticateResult Auth { get; set; } = new MqttClientAuthenticateResult();
@@ -51,7 +50,7 @@ namespace CPanel.MqttServer
             {
                 if (msg.Payload != null)
                     item.Data = Encoding.UTF8.GetString(msg.Payload);
-                await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+                await _signalRClient.connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
             }
             db.SaveChanges();
         }

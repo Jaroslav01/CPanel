@@ -18,6 +18,7 @@ using System.Threading;
 using CPanel.MqttServer;
 using CPanel.SignalR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 
 namespace CPanel.Controllers
 {
@@ -26,23 +27,24 @@ namespace CPanel.Controllers
     
     public class MqttController : ControllerBase
     {
-        HubConnection connection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:5001/hub")
-                .WithAutomaticReconnect()
-                .Build();
+        public IConfiguration _configuration { get; }
         private MqttServerClient _mqttServerClient;
-        public MqttController(MqttServerClient mqttServerClient)
+        private readonly SignalRClient _signalRClient;
+
+        public MqttController(MqttServerClient mqttServerClient, IConfiguration configuration, SignalRClient signalRClient)
         {
             _mqttServerClient = mqttServerClient;
+            _configuration = configuration;
+            _signalRClient = signalRClient;
         }
-        [Authorize(Roles = "Administrator,User")]
+        [Authorize(Roles = "user")]
         [HttpGet("Set")]
         public async Task<IActionResult> Send(string topic, string value)
         {
             await _mqttServerClient.Send(topic, value);
             return Ok();
         }
-        [Authorize(Roles = "Administrator,User")]
+        [Authorize(Roles = "user")]
         [HttpGet("Delete")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -52,7 +54,7 @@ namespace CPanel.Controllers
             {
                 db.Parameters.Remove(detail);
                 await _mqttServerClient.Unsubscribe(detail.Topic);
-                await connection.SendAsync("MqttSync", "delete", detail.Id, detail.DeviseId , detail.Name, detail.Topic, detail.Data, detail.Type);
+                await _signalRClient.connection.SendAsync("MqttSync", "delete", detail.Id, detail.DeviseId , detail.Name, detail.Topic, detail.Data, detail.Type);
             }
             db.SaveChanges();
             return Ok();
@@ -72,11 +74,11 @@ namespace CPanel.Controllers
             }).ToList();
             return response;
         }
-        [Authorize(Roles = "Administrator,User")]
+        [Authorize(Roles = "user")]
         [HttpGet("AddParameter")]
         public async Task<IActionResult> AddParameter(string name, string topic, string type)
         {
-            while (connection.State != HubConnectionState.Connected) await connection.StartAsync();
+            while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();
             using var db = new PeopleContext();
             var parameter = new Parameter
             {
@@ -88,14 +90,14 @@ namespace CPanel.Controllers
             await db.SaveChangesAsync();
             await _mqttServerClient.AddTopicsForSubscribe();
             var item = db.Parameters.FirstOrDefault(x => x.Topic == topic);
-            await connection.SendAsync("MqttSync", "add", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+            await _signalRClient.connection.SendAsync("MqttSync", "add", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
             return Ok();
         }
-        [Authorize(Roles = "Administrator,User")]
+        [Authorize(Roles = "user")]
         [HttpGet("UpdateParameter")]
         public async Task<IActionResult> UpdateParameter(int id, string name, string type)
         {
-            while (connection.State != HubConnectionState.Connected) await connection.StartAsync();
+            while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();
             using var db = new PeopleContext();
             var item = db.Parameters.FirstOrDefault(x => x.Id == id);
             item.Name = name;
@@ -104,7 +106,7 @@ namespace CPanel.Controllers
             var topicList = new List<string>();
             topicList.Add(item.Topic);
             await _mqttServerClient.Subscribe(topicList);
-            await connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+            await _signalRClient.connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
             return Ok();
         }
     }

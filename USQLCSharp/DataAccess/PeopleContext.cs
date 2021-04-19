@@ -7,7 +7,7 @@ namespace USQLCSharp.DataAccess
     {
         public PeopleContext(DbContextOptions options) : base(options) { }
         public PeopleContext() : base() { }
-        public DbSet<Person> People { get; set; }
+        public DbSet<Person> Person { get; set; }
         public DbSet<PersonState> PersonStates { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Device> Devices { get; set; }
