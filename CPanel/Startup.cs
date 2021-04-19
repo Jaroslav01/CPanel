@@ -12,6 +12,7 @@ using CPanel.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CPanel
 {
@@ -43,33 +44,30 @@ namespace CPanel
             services.AddSingleton<Client, Client>();
             //services.AddHostedService<BackgroundService>();
             services.AddHostedService<MyServiceA>();
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("RequireAdministratorRole",
-                     policy => policy.RequireRole("Administrator"));
-                //options.AddPolicy("ElevatedRights", policy =>
-                //policy.RequireRole("Administrator", "PowerUser", "BackupAdministrator"));
-            });
-            /*
-            services.AddIdentityCore<IdentityUser>()
-                .AddRoles<IdentityRole>()
-                .AddRoleStore<PeopleContext>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => Configuration.Bind("JwtSettings", options))
-    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => Configuration.Bind("CookieSettings", options));
-*/
+                    .AddJwtBearer(options =>
+                    {
+                        options.RequireHttpsMetadata = false;
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            // укзывает, будет ли валидироваться издатель при валидации токена
+                            ValidateIssuer = true,
+                            // строка, представляющая издателя
+                            ValidIssuer = AuthOptions.ISSUER,
 
-            services.AddAuthentication()
-               .AddCookie(options =>
-               {
-                   options.LoginPath = "/Account/Unauthorized/";
-                   options.AccessDeniedPath = "/Account/Forbidden/";
-               })
-               .AddJwtBearer(options =>
-               {
-                   options.Audience = "http://localhost:5001/";
-                   options.Authority = "http://localhost:5000/";
-               });
+                            // будет ли валидироваться потребитель токена
+                            ValidateAudience = true,
+                            // установка потребителя токена
+                            ValidAudience = AuthOptions.AUDIENCE,
+                            // будет ли валидироваться время существования
+                            ValidateLifetime = true,
+
+                            // установка ключа безопасности
+                            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                            // валидация ключа безопасности
+                            ValidateIssuerSigningKey = true,
+                        };
+                    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

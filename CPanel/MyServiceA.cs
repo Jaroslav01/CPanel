@@ -82,7 +82,6 @@ namespace CPanel
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                Console.WriteLine("MyServiceA is doing background work.");
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }
 

@@ -7,5 +7,11 @@
         public string PhoneNumber { get; set; }
 
         public string EmailAddress { get; set; }
+
+        public bool SubmitPhoneNumber { get; set; }
+
+        public bool SubmitEmailAddress { get; set; }
+
+        public int Admittance { get; set; }
     }
 }

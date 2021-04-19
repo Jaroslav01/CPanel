@@ -10,7 +10,11 @@ namespace USQLCSharp.Models
 
         public string LastName { get; set; }
 
+        public string Login { get; set; }
+
         public string Password { get; set; }
+
+        public string Role { get; set; }
 
         public string Birthsday { get; set; }
 
