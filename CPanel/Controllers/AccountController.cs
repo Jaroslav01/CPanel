@@ -26,7 +26,6 @@ namespace CPanel.Controllers
             {
                 return BadRequest(new { errorText = "Invalid username or password." });
             }
-
             var now = DateTime.UtcNow;
             // создаем JWT-токен
             var jwt = new JwtSecurityToken(
@@ -37,13 +36,11 @@ namespace CPanel.Controllers
                     expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
             var response = new
             {
                 access_token = encodedJwt,
                 username = identity.Name
             };
-
             return Json(response);
         }
 
@@ -56,19 +53,18 @@ namespace CPanel.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, person.Login),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, person.Role)
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, person.Role),
                 };
                 ClaimsIdentity claimsIdentity =
                 new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
                 return claimsIdentity;
             }
-
             // если пользователя не найдено
             return null;
         }
-        [HttpPost("registration")]
-        public IActionResult Registration(string login, string password, string firstName, string lastName)
+        [HttpPost("Register")]
+        public IActionResult Register(string login, string password, string firstName, string lastName)
         {
             using var _db = new PeopleContext();
             var persons = _db.Person.FirstOrDefault(x => x.Login == login);
