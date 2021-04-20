@@ -38,14 +38,14 @@ namespace CPanel.Controllers
             _signalRClient = signalRClient;
         }
         [Authorize(Roles = "user")]
-        [HttpGet("Set")]
+        [HttpPost("Set")]
         public async Task<IActionResult> Send(string topic, string value)
         {
             await _mqttServerClient.Send(topic, value);
             return Ok();
         }
         [Authorize(Roles = "user")]
-        [HttpGet("Delete")]
+        [HttpPost("Delete")]
         public async Task<IActionResult> Delete(int id)
         {
             using var db = new PeopleContext();
@@ -59,7 +59,7 @@ namespace CPanel.Controllers
             db.SaveChanges();
             return Ok();
         }
-        [HttpGet("GetParameters")]
+        [HttpPost("GetParameters")]
         public List<Parameter> GetParameters()
         {
             using var db = new PeopleContext();
@@ -75,7 +75,7 @@ namespace CPanel.Controllers
             return response;
         }
         [Authorize(Roles = "user")]
-        [HttpGet("AddParameter")]
+        [HttpPost("AddParameter")]
         public async Task<IActionResult> AddParameter(string name, string topic, string type)
         {
             while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();
@@ -94,7 +94,7 @@ namespace CPanel.Controllers
             return Ok();
         }
         [Authorize(Roles = "user")]
-        [HttpGet("UpdateParameter")]
+        [HttpPost("UpdateParameter")]
         public async Task<IActionResult> UpdateParameter(int id, string name, string type)
         {
             while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();

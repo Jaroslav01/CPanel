@@ -1,19 +1,22 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import {MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import * as signalR from "@microsoft/signalr";
+import { LocalStorageService } from '../local-storage.service';
 import {
   MatSnackBar,
   MatSnackBarHorizontalPosition,
   MatSnackBarVerticalPosition,
 } from '@angular/material/snack-bar';
+import { AppComponent } from '../app.component';
 
 export interface DialogData {
   animal: 'panda' | 'unicorn' | 'lion';
 }
 @Component({
   selector: 'app-home',
-  templateUrl: './home.component.html'
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
   showFiller = false;
@@ -27,11 +30,11 @@ export class HomeComponent implements OnInit {
   public topic: string;
   public response: Parameter[];
   public res: Parameter[]; 
-    constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar) {
-    http.get<Parameter[]>(baseUrl + 'mqtt/GetParameters').subscribe(result => {
+  constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar, public localStorag: LocalStorageService, public appComponent: AppComponent) {
+    http.post<Parameter[]>(baseUrl + 'mqtt/GetParameters', {}, this.httpOptions()).subscribe((result) => {
       this.response = result;
-      console.log(this.response);
-    }, error => console.error(error));
+      console.log(result);
+    });
   }
   ngOnInit() {
     this.start();
@@ -44,7 +47,7 @@ export class HomeComponent implements OnInit {
             this.response[i]["deviseId"] = deviseId;
             this.response[i]["name"] = name;
             this.response[i]["topic"] = topic;
-            this.response[i]["data"] = Boolean(Number(data));
+            this.response[i]["data"] = data;
             this.response[i]["type"] = type;
           }
         }
@@ -62,6 +65,15 @@ export class HomeComponent implements OnInit {
         }
       }
     });
+  }
+  public httpOptions() {
+    var headers_object = new HttpHeaders().set("Authorization", "Bearer " + this.localStorag.get("access_token"));
+    headers_object.append('Content-Type', 'application/json');
+    headers_object.append("Authorization", "Bearer " + this.localStorag.get("access_token"));
+    const httpOptions = {
+      headers: headers_object
+    };
+    return httpOptions;
   }
   public async start() {
     try {
@@ -86,38 +98,30 @@ export class HomeComponent implements OnInit {
       }
     }); 
   }
-  public OnOff(topic: string, value: Boolean) {
-    var valueNumber: String;
-    if (!value == true) {
-      valueNumber = "1";
-    } else {
-      valueNumber = "0";
+  public OnOff(topic: string, value: string, type: string) {
+    if (type == "button") {
+      if (value == "1") value = "0";
+      else value = "1";
     }
-    this.http.get<any>(this.baseUrl + "mqtt/set?topic=" + topic + "&value=" + valueNumber).toPromise()
-      .then(function (response) {
-        return response.text();
-      });
+    this.http.post<any>(this.baseUrl + "mqtt/set?topic=" + topic + "&value=" + value, {}, this.httpOptions()).subscribe((result) => {
+      console.log(result);
+    });
     this.openSnackBar("Updated", "Hide");
   }
+  type: string;
   public Update(id: string) {
     var name = <HTMLInputElement>document.getElementById(id + "name");
-    var type: string;
-    var a = this.http.get<any>(this.baseUrl + "mqtt/UpdateParameter?id=" + id + "&name=" + name.value + "&type=" + type).toPromise()
-      .then(function (response) {
-        this.openSnackBar("Updated", "Hide");
-      return response.text();
-      }).then(function (text) {
-        this.openSnackBar("Error", "Hide");
-        return text();
-      });
+    this.http.post<any>(this.baseUrl + "mqtt/UpdateParameter?id=" + id + "&name=" + name.value + "&type=" + this.type, {}, this.httpOptions()).subscribe((result) => {
+      console.log(result);
+      this.openSnackBar("Updated", "Hide");
+    });
   }
   public Delete(id: string) {
     var name = <HTMLInputElement>document.getElementById(id + "name");
-    this.http.get<any>(this.baseUrl + "mqtt/Delete?id=" + id).toPromise()
-      .then(function (response) {
-        return response.text();
-      });
-    this.openSnackBar("Deleted " + name.value, "Hide");
+    this.http.post<any>(this.baseUrl + "mqtt/Delete?id=" + id, {}, this.httpOptions()).subscribe((result) => {
+      console.log(result);
+      this.openSnackBar("Deleted", "Hide");
+    });
   }
 }
 
@@ -136,11 +140,11 @@ interface Parameter {
 })
 export class DialogElementsExampleDialog {
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string, private _snackBar: MatSnackBar) { }
+  type: string;
   public Add() {
-    var type:string;
     var topic = <HTMLInputElement>document.getElementById("topic");
     var name = <HTMLInputElement>document.getElementById("name");
-    this.http.get<any>(this.baseUrl + "mqtt/AddParameter?topic=" + topic.value + "&type" + type + "&name=" + name.value).toPromise()
+    this.http.get<any>(this.baseUrl + "mqtt/AddParameter?topic=" + topic.value + "&type" + this.type + "&name=" + name.value).toPromise()
       .then(function (response) {
         return response.text();
       });

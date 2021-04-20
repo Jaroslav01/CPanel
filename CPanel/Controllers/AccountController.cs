@@ -21,7 +21,10 @@ namespace CPanel.Controllers
         [HttpPost("token")]
         public IActionResult Token(string username, string password)
         {
-            var identity = GetIdentity(username, password);
+            using var _db = new PeopleContext();
+
+            Person person = _db.Person.FirstOrDefault(x => x.Login == username && x.Password == password);
+            var identity = GetIdentity(username, password, person);
             if (identity == null)
             {
                 return BadRequest(new { errorText = "Invalid username or password." });
@@ -39,15 +42,15 @@ namespace CPanel.Controllers
             var response = new
             {
                 access_token = encodedJwt,
-                username = identity.Name
+                email = identity.Name,
+                username = $"{person.FirstName} {person.LastName}",
+                role = person.Role
             };
             return Json(response);
         }
 
-        private ClaimsIdentity GetIdentity(string username, string password)
+        private ClaimsIdentity GetIdentity(string username, string password, Person person)
         {
-            using var _db = new PeopleContext();
-            Person person = _db.Person.FirstOrDefault(x => x.Login == username && x.Password == password);
             if (person != null)
             {
                 var claims = new List<Claim>

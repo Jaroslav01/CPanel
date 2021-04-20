@@ -29,6 +29,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 
 import * as signalR from "@microsoft/signalr";
 import { LoginComponent } from './login/login.component';
+import { AccountComponent } from './account/account.component';
 
 
 @NgModule({
@@ -40,6 +41,7 @@ import { LoginComponent } from './login/login.component';
     DialogElementsExampleDialog,
     CounterComponent,
     LoginComponent,
+    AccountComponent,
 
   ],
   imports: [
@@ -65,6 +67,7 @@ import { LoginComponent } from './login/login.component';
       { path: 'counter', component: CounterComponent },
       { path: 'panel', component: PanelComponent },
       { path: 'login', component: LoginComponent },
+      { path: 'account', component: AccountComponent },
     ]),
     BrowserAnimationsModule
   ],

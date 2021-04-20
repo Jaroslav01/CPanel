@@ -37,21 +37,31 @@
   </mat-drawer>
   <div class="example-sidenav-content">
     <div class="card d-inline-block h-100 w-100" style="width:500px">
-      <img class="card-img-top" src="https://media.gettyimages.com/vectors/light-bulb-icon-vector-id1135547096?k=6&m=1135547096&s=612x612&w=0&h=TJL7GfdIobWwtscGfDV6Kzs9FS9pCq3x5Z7bSnXHQ_Y=" alt="Card image">
+      <img *ngIf="responses.data == '0'" class="card-img-top" src="{{baseUrl}}images/LampOff2.jpg" alt="Card image">
+      <img *ngIf="responses.data == '1'" class="card-img-top" src="{{baseUrl}}images/LampOn2.jpg" alt="Card image">
       <div class="card-body" style="border-top: 5px solid;">
         <h4 class="card-title">{{responses.name}}</h4>
         <p class="card-text" style="top: 100%; position: sticky;"></p>
         <button (click)="drawer.toggle()" mat-icon-button aria-label="Example icon button with a vertical three dot icon">
           <mat-icon>settings</mat-icon>
         </button>
-        <mat-slide-toggle class="example-margin"
-                          [checked]="responses.data"
-                          (click)="OnOff(responses.topic, responses.data)">
-        </mat-slide-toggle>
-        <!-- <mat-slider *ngIf="responses.type == 'slider'" min="0" max="255" step="10" value="responses.data"></mat-slider>-->
+        <button *ngIf="responses.type == 'button'" (click)="OnOff(responses.topic, responses.data, responses.type)" class="lamp_btn" mat-raised-button>
+          <div *ngIf="responses.data == '0'">
+            On
+          </div>
+          <div *ngIf="responses.data == '1'">
+            off
+          </div>
+        </button>
+
+        <mat-slider *ngIf="responses.type == 'slider'" (click)="OnOff(responses.topic, responses.data, responses.type)"
+                    min="0" max="255" step="10" value="responses.data"></mat-slider>
 
       </div>
     </div>
   </div>
 </mat-drawer-container>
-<button mat-fab color="primary" aria-label="Example icon button with a vertical three dot icon" (click)="openDialog()" style="bottom: 0px; right: 0px; position: fixed; margin: 2%;"><mat-icon>add_circle</mat-icon></button>
+<button mat-fab color="primary" aria-label="Example icon button with a vertical three dot icon" (click)="openDialog()" style="    background-color: #343a40; bottom: 0px;
+    right: 0px;
+    position: fixed;
+    margin: 2%;"><mat-icon>add_circle</mat-icon></button>
