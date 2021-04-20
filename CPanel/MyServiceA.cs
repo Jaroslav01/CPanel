@@ -38,7 +38,11 @@ namespace CPanel
             {
                 _mqttServerClient.Auth = await _mqttServerClient.Client.ConnectAsync(_mqttServerClient.options);
                 if (_mqttServerClient.Client.IsConnected != true)
+                {
+                    Console.WriteLine("### CONNECTING FAILED ###");
                     await Task.Delay(1000);
+                }
+                Console.WriteLine("### CONNECTING SUCESSFUL ###");
             }
         }
         private async Task StartSubscribe()

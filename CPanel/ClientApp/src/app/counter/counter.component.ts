@@ -2,6 +2,8 @@ import * as signalR from "@microsoft/signalr";
 
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
+import { AppComponent } from "../app.component";
+import { LocalStorageService } from "../local-storage.service";
 
 @Component({
   selector: 'app-counter',
@@ -10,10 +12,12 @@ import { Component, Inject } from '@angular/core';
 })
 
 export class CounterComponent {
+
   public connection = new signalR.HubConnectionBuilder()
     .withUrl("/hub")
     .build();
-  constructor(http: HttpClient, @Inject('BASE_URL') public baseUrl: string) {
+  constructor(http: HttpClient, @Inject('BASE_URL') public baseUrl: string, public localStorag: LocalStorageService,
+    public appComponent: AppComponent) {
     this.start();
     var divMessages = <HTMLDivElement>document.getElementById("divMessages");
     var tbMessage = <HTMLInputElement>document.getElementById("tbMessage");
@@ -36,7 +40,7 @@ export class CounterComponent {
     var divMessages = <HTMLDivElement>document.getElementById("divMessages");
     var tbMessage = <HTMLInputElement>document.getElementById("tbMessage");
     var btnSend = <HTMLButtonElement>document.getElementById("btnSend");
-    var username = new Date().getTime();
+    var username = this.appComponent.title;
 
     if (this.connection.start.apply) {
       this.connection.on("messageReceived", (username: string, message: string) => {

@@ -24,9 +24,7 @@ namespace CPanel
         {
             Configuration = configuration;
         }
-
         public IConfiguration Configuration { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -39,7 +37,6 @@ namespace CPanel
             services.AddDbContext<PeopleContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-
             });
             services.AddSignalR();
             services.AddSingleton<MqttServerClient, MqttServerClient>();
@@ -71,7 +68,6 @@ namespace CPanel
                         };
                     });
         }
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -87,14 +83,12 @@ namespace CPanel
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             if (!env.IsDevelopment())
             {
                 app.UseSpaStaticFiles();
             }
-
             app.UseRouting();
             app.UseDefaultFiles();
             app.UseStaticFiles();
@@ -108,7 +102,6 @@ namespace CPanel
                 endpoints.MapHub<ChatHub>("/hub");
 
             });
-
             app.UseSpa(spa =>
             {
                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
@@ -121,7 +114,6 @@ namespace CPanel
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
-            
         }
     }
 }

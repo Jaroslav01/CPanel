@@ -38,13 +38,14 @@ export class HomeComponent implements OnInit {
   }
   ngOnInit() {
     this.start();
-    this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, name: string, topic: string, data: string, type: string) => {
+    this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, userId: number, name: string, topic: string, data: string, type: string) => {
       var item: Parameter;
       console.log(action)
       if (action == "update") {
         for (var i = 0; i < this.response.length; i++) {
           if (this.response[i]["id"] == id) {
             this.response[i]["deviseId"] = deviseId;
+            this.response[i]["userId"] = userId;
             this.response[i]["name"] = name;
             this.response[i]["topic"] = topic;
             this.response[i]["data"] = data;
@@ -54,7 +55,7 @@ export class HomeComponent implements OnInit {
       }
       else if (action == "add") {
         var item: Parameter;
-        item = { id, deviseId, name, topic, data, type };
+        item = { id, deviseId, userId, name, topic, data, type };
         this.response.push(item);
       }
       else if (action == "delete") {
@@ -128,6 +129,7 @@ export class HomeComponent implements OnInit {
 interface Parameter {
   id: number;
   deviseId: number;
+  userId: number;
   name: string;
   topic: string;
   data: any;

@@ -54,43 +54,39 @@ namespace CPanel.Controllers
             {
                 db.Parameters.Remove(detail);
                 await _mqttServerClient.Unsubscribe(detail.Topic);
-                await _signalRClient.connection.SendAsync("MqttSync", "delete", detail.Id, detail.DeviseId , detail.Name, detail.Topic, detail.Data, detail.Type);
+                await _signalRClient.connection.SendAsync("MqttSync", "delete", detail.Id, detail.DeviseId, detail.UserId, detail.Name, detail.Topic, detail.Data, detail.Type);
             }
             db.SaveChanges();
             return Ok();
         }
+        [Authorize(Roles = "user")]
         [HttpPost("GetParameters")]
         public List<Parameter> GetParameters()
         {
             using var db = new PeopleContext();
-            var response = db.Parameters.Select(x => new Parameter
-            {
-                Id = x.Id,
-                Data = x.Data,
-                DeviseId = x.DeviseId,
-                Name = x.Name,
-                Topic = x.Topic,
-                Type = x.Type
-            }).ToList();
+            var user = db.Person.FirstOrDefault(x => x.Login == User.Identity.Name);
+            var response = db.Parameters.Where(x => x.UserId == user.Id).ToList();
             return response;
         }
         [Authorize(Roles = "user")]
         [HttpPost("AddParameter")]
         public async Task<IActionResult> AddParameter(string name, string topic, string type)
         {
-            while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();
+//            while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();
             using var db = new PeopleContext();
+            var user = db.Person.FirstOrDefault(x => x.Login == User.Identity.Name);
             var parameter = new Parameter
             {
                 Name = name,
                 Topic = topic,
-                Type = type
+                Type = type, 
+                UserId = user.Id
             };
             await db.AddAsync(parameter);
             await db.SaveChangesAsync();
             await _mqttServerClient.AddTopicsForSubscribe();
             var item = db.Parameters.FirstOrDefault(x => x.Topic == topic);
-            await _signalRClient.connection.SendAsync("MqttSync", "add", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+            await _signalRClient.connection.SendAsync("MqttSync", "add", item.Id, item.DeviseId, item.UserId, item.Name, item.Topic, item.Data, item.Type);
             return Ok();
         }
         [Authorize(Roles = "user")]
@@ -106,7 +102,7 @@ namespace CPanel.Controllers
             var topicList = new List<string>();
             topicList.Add(item.Topic);
             await _mqttServerClient.Subscribe(topicList);
-            await _signalRClient.connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.Name, item.Topic, item.Data, item.Type);
+            await _signalRClient.connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.UserId, item.Name, item.Topic, item.Data, item.Type);
             return Ok();
         }
     }

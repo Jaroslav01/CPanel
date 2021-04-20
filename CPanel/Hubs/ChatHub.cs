@@ -25,7 +25,7 @@ namespace CPanel.Hubs
         {
             await Clients.All.SendAsync("get", id, name);
         }
-        public async Task MqttSync(string action, int id, int deviseId, string name, string topic, string data, string type)
+        public async Task MqttSync(string action, int id, int deviseId, int userId, string name, string topic, string data, string type)
         {
             await Clients.All.SendAsync("mqttsyncres", action, id, deviseId, name, topic, data, type);
         }
