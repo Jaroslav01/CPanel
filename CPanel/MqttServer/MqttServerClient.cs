@@ -43,14 +43,43 @@ namespace CPanel.MqttServer
         {
             //var db = (PeopleContext)services.GetService(typeof(PeopleContext));
             using var db = new PeopleContext();
-
             var msg = me.ApplicationMessage;
             var item = db.Parameters.FirstOrDefault(x => x.Topic == msg.Topic);
+
             if (item != null)
             {
                 if (msg.Payload != null)
                     item.Data = Encoding.UTF8.GetString(msg.Payload);
                 await _signalRClient.connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.UserId, item.Name, item.Topic, item.Data, item.Type);
+            }
+            else
+            {
+                var tS = msg.Topic.Split("/");
+                var devices = db.Devices.Where(x => x.Topic == tS[0] + "/" + tS[1]).ToList<Device>();
+                var payload = Encoding.UTF8.GetString(msg.Payload);
+                foreach (var device in devices)
+                {
+                    if (msg.Topic == device.Topic + "/uptime")
+                    {
+                        device.Uptime = Int32.Parse(payload);
+                    }
+                    else if (msg.Topic == device.Topic + "/mac")
+                    {
+                        device.Mac = payload;
+                    }
+                    else if (msg.Topic == device.Topic + "/wanip")
+                    {
+                        device.Ip = payload;
+                    }
+                    else if (msg.Topic == device.Topic + "/rssi")
+                    {
+                        device.Rssi = Int32.Parse(payload);
+                    }
+                    else if (msg.Topic == device.Topic + "/freemem")
+                    {
+                        device.FreeMem = Int32.Parse(payload);
+                    }
+                }
             }
             db.SaveChanges();
         }
@@ -61,14 +90,23 @@ namespace CPanel.MqttServer
         public async Task AddTopicsForSubscribe()
         {
             var parametersList = GetParameters();
+            var deviceList = GetDevices();
             var topicList = new List<string>();
             for (int i = 0; i < parametersList.Count; i++)
             {
-                for (int j = 0; j < Result.Count; j++)
+                topicList.Add(parametersList[i].Topic);
+            }
+            for (int i = 0; i < deviceList.Count; i++)
+            {
+                string[] topics =
                 {
-                    if (parametersList[i].Topic == Result[j].ResultCode.ToString()) continue;
-                    topicList.Add(parametersList[i].Topic);
-                }
+                    deviceList[i].Topic + "/uptime",
+                    deviceList[i].Topic + "/mac",
+                    deviceList[i].Topic + "/wanip",
+                    deviceList[i].Topic + "/rssi",
+                    deviceList[i].Topic + "/freemem"
+                };
+                topicList.AddRange(topics);
             }
             await Subscribe(topicList);
         }
@@ -114,6 +152,25 @@ namespace CPanel.MqttServer
                 Name = x.Name,
                 Topic = x.Topic,
                 Type = x.Type
+            }).ToList();
+            return response;
+        }
+        public List<Device> GetDevices()
+        {
+            //var db = (PeopleContext)services.GetService(typeof(PeopleContext));
+            using var db = new PeopleContext();
+            var response = db.Devices.Select(x => new Device
+            {
+                Id = x.Id,
+                Ip = x.Ip,
+                Mac = x.Mac,
+                Name = x.Name,
+                Rssi = x.Rssi,
+                Topic = x.Topic,
+                Uptime = x.Uptime,
+                UserId = x.UserId,
+                FreeMem = x.FreeMem,
+                Parameters = x.Parameters,
             }).ToList();
             return response;
         }

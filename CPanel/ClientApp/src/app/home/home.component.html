@@ -1,4 +1,62 @@
-<h1 id="tableLabel">Buttons</h1>
+<mat-tab-group *ngFor="let responses of response" dynamicHeight>
+  <mat-tab label="Control">
+    <button *ngFor="let parameter of responses.parameters" class="example-small-box mat-elevation-z4" (click)="OnOff(parameter.topic, parameter.data, parameter.type)">
+      <img *ngIf="parameter.data == '1'" class="lamp_img" src="{{baseUrl}}images/LampOn2.jpg" alt="Alternate Text" />
+      <img *ngIf="parameter.data == '0'" class="lamp_img" src="{{baseUrl}}images/LampOff2.jpg" alt="Alternate Text" />
+      <div class="lamp_btn_text">
+        {{parameter.name}}
+      </div>
+    </button>
+  </mat-tab>
+  <mat-tab label="Info">
+    <mat-card class="example-card">
+      <mat-card-header>
+        <div mat-card-avatar class="example-header-image"></div>
+        <mat-card-title>{{responses.name}}</mat-card-title>
+        <mat-card-subtitle>Id: {{responses.id}}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>
+          IP: <a href="http://{{responses.ip}}/">{{responses.ip}}</a>
+        </p>
+        <p>
+          Mac: {{responses.mac}}
+        </p>
+        <p class="rssi">
+          <mat-icon *ngIf="responses.rssi > -60">signal_cellular_4_bar</mat-icon>
+          <mat-icon *ngIf="responses.rssi < -60">signal_cellular_connected_no_internet_4_bar</mat-icon>
+        </p>
+        <p>
+          UpTime: {{responses.uptime}}s
+        </p>
+        <p>
+          Topic: {{responses.topic}}
+        </p>
+        <p>
+          Free memory: {{responses.freeMem}}
+        </p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button>LIKE</button>
+        <button mat-button>SHARE</button>
+      </mat-card-actions>
+    </mat-card>
+  </mat-tab>
+  <mat-tab label="Settings">
+    <div class="example-large-box mat-elevation-z4">
+      Large content
+    </div>
+  </mat-tab>
+</mat-tab-group>
+
+
+
+
+
+
+
+
+<!--
 <p *ngIf="!response"><em><div class="spinner-grow text-warning"></div></em></p>
 <mat-drawer-container *ngFor="let responses of response" class="card d-inline-block m-2" style="width:300px; height:430px;" aria-setsize="100%">
   <mat-drawer #drawer class="example-sidenav" mode="side" style="width: 300px; height: 430px;">
@@ -39,6 +97,7 @@
     <div class="card d-inline-block h-100 w-100" style="width:500px">
       <img *ngIf="responses.data == '0'" class="card-img-top" src="{{baseUrl}}images/LampOff2.jpg" alt="Card image">
       <img *ngIf="responses.data == '1'" class="card-img-top" src="{{baseUrl}}images/LampOn2.jpg" alt="Card image">
+      <img *ngIf="responses.data != '0' && responses.data != '1'" class="card-img-top" src="{{baseUrl}}images/Offline.png" alt="Card image">
       <div class="card-body" style="border-top: 5px solid;">
         <h4 class="card-title">{{responses.name}}</h4>
         <p class="card-text" style="top: 100%; position: sticky;"></p>
@@ -61,7 +120,10 @@
     </div>
   </div>
 </mat-drawer-container>
+  -->
 <button mat-fab color="primary" aria-label="Example icon button with a vertical three dot icon" (click)="openDialog()" style="    background-color: #343a40; bottom: 0px;
     right: 0px;
     position: fixed;
-    margin: 2%;"><mat-icon>add_circle</mat-icon></button>
+    margin: 2%;">
+  <mat-icon>add_circle</mat-icon>
+</button>

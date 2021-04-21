@@ -28,34 +28,50 @@ export class HomeComponent implements OnInit {
   public currentCount = 0;
   public i = 1;
   public topic: string;
-  public response: Parameter[];
-  public res: Parameter[]; 
+  public response: Devices[];
+  public res: Devices[]; 
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar, public localStorag: LocalStorageService, public appComponent: AppComponent) {
-    http.post<Parameter[]>(baseUrl + 'mqtt/GetParameters', {}, this.httpOptions()).subscribe((result) => {
+    http.post<Devices[]>(baseUrl + 'mqtt/GetDevices', {}, this.httpOptions()).subscribe((result) => {
       this.response = result;
       console.log(result);
     });
   }
   ngOnInit() {
     this.start();
-    this.connection.on("mqttsyncres", (action: string, id: number, deviseId: number, userId: number, name: string, topic: string, data: string, type: string) => {
-      var item: Parameter;
+    this.connection.on("devices", (
+      action: string,
+      id: number,
+      userId: number,
+      uptime: number,
+      rssi: number,
+      name: string,
+      topic: string,
+      ip: string,
+      mac: string,
+      freeMem: number,
+      parameters: Parameter[]
+    ) => {
+      var item: Devices;
       console.log(action)
       if (action == "update") {
         for (var i = 0; i < this.response.length; i++) {
           if (this.response[i]["id"] == id) {
-            this.response[i]["deviseId"] = deviseId;
             this.response[i]["userId"] = userId;
+            this.response[i]["uptime"] = uptime;
+            this.response[i]["rssi"] = rssi;
             this.response[i]["name"] = name;
             this.response[i]["topic"] = topic;
-            this.response[i]["data"] = data;
-            this.response[i]["type"] = type;
+            this.response[i]["ip"] = ip;
+            this.response[i]["mac"] = mac;
+            this.response[i]["freeMem"] = freeMem;
+            this.response[i]["parameters"] = parameters;
           }
         }
       }
+
       else if (action == "add") {
-        var item: Parameter;
-        item = { id, deviseId, userId, name, topic, data, type };
+        var item: Devices;
+        item = { id, userId, uptime, rssi, name, topic, ip, mac, freeMem, parameters};
         this.response.push(item);
       }
       else if (action == "delete") {
@@ -125,7 +141,18 @@ export class HomeComponent implements OnInit {
     });
   }
 }
-
+interface Devices {
+  id: number;
+  userId: number;
+  uptime: number;
+  rssi: number;
+  name: string;
+  topic: string;
+  ip: string;
+  mac: string;
+  freeMem: number;
+  parameters: Parameter[];
+}
 interface Parameter {
   id: number;
   deviseId: number;

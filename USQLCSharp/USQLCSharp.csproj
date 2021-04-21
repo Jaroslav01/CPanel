@@ -222,6 +222,10 @@
     <Compile Include="Migrations\20210420195507_user.designer.cs">
       <DependentUpon>20210420195507_user.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20210421074347_devices.cs" />
+    <Compile Include="Migrations\20210421074347_devices.designer.cs">
+      <DependentUpon>20210421074347_devices.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\PeopleContextModelSnapshot.cs" />
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\Device.cs" />

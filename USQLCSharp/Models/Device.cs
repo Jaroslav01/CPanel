@@ -6,6 +6,8 @@ namespace USQLCSharp.Models
     {
         public int Id { get; set; }
 
+        public int UserId { get; set; }
+
         public int Uptime { get; set; }
 
         public int Rssi { get; set; }
@@ -18,7 +20,7 @@ namespace USQLCSharp.Models
 
         public string Mac { get; set; }
 
-        public bool State { get; set; }
+        public int FreeMem { get; set; }
 
         public List<Parameter> Parameters { get; set; } = new List<Parameter>();
     }

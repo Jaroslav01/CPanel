@@ -61,7 +61,6 @@ namespace CPanel
             {
                 Console.WriteLine("### DISCONNECTED FROM SERVER ###");
                 await Task.Delay(TimeSpan.FromSeconds(5));
-
                 try
                 {
                     await _mqttServerClient.Client.ReconnectAsync(); // Since 3.0.5 with CancellationToken
@@ -72,15 +71,13 @@ namespace CPanel
                     Console.WriteLine("### RECONNECTING FAILED ###");
                 }
             });
-
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             //Console.WriteLine("MyServiceA is starting.");
-
             await StartMqtt();
             await _signalRClient.connection.StartAsync();
-            await StartSubscribe();
+            await _mqttServerClient.AddTopicsForSubscribe();
             await _mqttServerClient.WaitForReciveMessage();
             await ReconnectHendler();
 

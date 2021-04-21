@@ -24,7 +24,7 @@ namespace CPanel.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    
+
     public class MqttController : ControllerBase
     {
         public IConfiguration _configuration { get; }
@@ -49,7 +49,8 @@ namespace CPanel.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             using var db = new PeopleContext();
-            var deleteOrderDetails = db.Parameters.Where(x => x.Id == id);
+            var user = db.Person.FirstOrDefault(x => x.Login == User.Identity.Name);
+            var deleteOrderDetails = db.Parameters.Where(x => x.Id == id && x.UserId == user.Id);
             foreach (var detail in deleteOrderDetails)
             {
                 db.Parameters.Remove(detail);
@@ -72,20 +73,20 @@ namespace CPanel.Controllers
         [HttpPost("AddParameter")]
         public async Task<IActionResult> AddParameter(string name, string topic, string type)
         {
-//            while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();
+            //            while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();
             using var db = new PeopleContext();
             var user = db.Person.FirstOrDefault(x => x.Login == User.Identity.Name);
             var parameter = new Parameter
             {
                 Name = name,
                 Topic = topic,
-                Type = type, 
+                Type = type,
                 UserId = user.Id
             };
             await db.AddAsync(parameter);
             await db.SaveChangesAsync();
             await _mqttServerClient.AddTopicsForSubscribe();
-            var item = db.Parameters.FirstOrDefault(x => x.Topic == topic);
+            var item = db.Parameters.FirstOrDefault(x => x.Topic == topic && x.UserId == user.Id);
             await _signalRClient.connection.SendAsync("MqttSync", "add", item.Id, item.DeviseId, item.UserId, item.Name, item.Topic, item.Data, item.Type);
             return Ok();
         }
@@ -93,9 +94,10 @@ namespace CPanel.Controllers
         [HttpPost("UpdateParameter")]
         public async Task<IActionResult> UpdateParameter(int id, string name, string type)
         {
-            while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();
+            //            while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();
             using var db = new PeopleContext();
-            var item = db.Parameters.FirstOrDefault(x => x.Id == id);
+            var user = db.Person.FirstOrDefault(x => x.Login == User.Identity.Name);
+            var item = db.Parameters.FirstOrDefault(x => x.Id == id && x.UserId == user.Id);
             item.Name = name;
             item.Type = type;
             await db.SaveChangesAsync();
@@ -103,6 +105,64 @@ namespace CPanel.Controllers
             topicList.Add(item.Topic);
             await _mqttServerClient.Subscribe(topicList);
             await _signalRClient.connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.UserId, item.Name, item.Topic, item.Data, item.Type);
+            return Ok();
+        }
+        // Device //
+        [Authorize(Roles = "user")]
+        [HttpPost("GetDevices")]
+        public List<Device> GetDevices()
+        {
+            using var db = new PeopleContext();
+            var user = db.Person.FirstOrDefault(x => x.Login == User.Identity.Name);
+            var response = db.Devices.Where(x => x.UserId == user.Id).ToList();
+            foreach (var device in response)
+            {
+                device.Parameters = db.Parameters.Where(x => x.DeviseId == device.Id).ToList();
+            }
+            return response;
+        }
+        [Authorize(Roles = "user")]
+        [HttpPost("AddDevices")]
+        public async Task<IActionResult> AddDevices(string name, string topic)
+        {
+            //            while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();
+            using var db = new PeopleContext();
+            var user = db.Person.FirstOrDefault(x => x.Login == User.Identity.Name);
+            var devices = new Device
+            {
+                Name = name,
+                Topic = topic,
+                UserId = user.Id,
+                Parameters = db.Parameters.Where(x => x.UserId == user.Id).ToList(),
+            };
+            await db.AddAsync(devices);
+            await db.SaveChangesAsync();
+            var item = db.Devices.FirstOrDefault(x => x.Topic == topic && x.UserId == user.Id);
+            // await _signalRClient.connection.SendAsync("MqttSync", "add", item.Id, item.DeviseId, item.UserId, item.Name, item.Topic, item.Data, item.Type);
+            await _mqttServerClient.AddTopicsForSubscribe();
+            return Ok();
+        }
+        [Authorize(Roles = "user")]
+        [HttpPost("UpdateDevices")]
+        public async Task<IActionResult> UpdateDevices(int id, string name)
+        {
+            //            while (_signalRClient.connection.State != HubConnectionState.Connected) await _signalRClient.connection.StartAsync();
+            using var db = new PeopleContext();
+            var user = db.Person.FirstOrDefault(x => x.Login == User.Identity.Name);
+            var device = db.Devices.FirstOrDefault(x => x.Id == id && x.UserId == user.Id);
+            device.Name = name;
+            await db.SaveChangesAsync();
+            var topicList = new List<string>();
+            string[] topics =
+            {
+                device.Topic + "/uptime",
+                device.Topic + "/mac",
+                device.Topic + "/wanip",
+                device.Topic + "/rssi",
+                device.Topic + "/freemem"
+            };
+            await _mqttServerClient.Subscribe(topicList);
+            //await _signalRClient.connection.SendAsync("MqttSync", "update", device.Id, device.DeviseId, device.UserId, item.Name, item.Topic, item.Data, item.Type);
             return Ok();
         }
     }
