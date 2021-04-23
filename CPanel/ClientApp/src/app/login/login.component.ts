@@ -1,27 +1,42 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from '../local-storage.service';
 import { AppComponent } from '../app.component';
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
+  providers: [{
+    provide: STEPPER_GLOBAL_OPTIONS, useValue: { showError: true }
+  }]
 })
 export class LoginComponent implements OnInit {
   hide = true;
   token: Token;
+  isLinear = false;
+
   constructor(
     public http: HttpClient,
     @Inject('BASE_URL') public baseUrl: string,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     public localStorag: LocalStorageService,
-    public appComponent: AppComponent) {
+    public appComponent: AppComponent,
+    private _formBuilder: FormBuilder  ) {
   }
+  firstFormGroup: FormGroup;
+  secondFormGroup: FormGroup;
   ngOnInit() {
+    this.firstFormGroup = this._formBuilder.group({
+      firstCtrl: ['', Validators.required]
+    });
+    this.secondFormGroup = this._formBuilder.group({
+      secondCtrl: ['', Validators.required]
+    });
   }
   Login() {
     var loginemail = <HTMLInputElement>document.getElementById("loginemail");

@@ -50,7 +50,7 @@ namespace CPanel.MqttServer
             {
                 if (msg.Payload != null)
                     item.Data = Encoding.UTF8.GetString(msg.Payload);
-                await _signalRClient.connection.SendAsync("MqttSync", "update", item.Id, item.DeviseId, item.UserId, item.Name, item.Topic, item.Data, item.Type);
+                await _signalRClient.connection.SendAsync("Parameters", "update", item);
             }
             else
             {
@@ -79,6 +79,8 @@ namespace CPanel.MqttServer
                     {
                         device.FreeMem = Int32.Parse(payload);
                     }
+                    await _signalRClient.connection.SendAsync("Devices", "update", device);
+
                 }
             }
             db.SaveChanges();

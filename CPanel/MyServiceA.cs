@@ -45,16 +45,6 @@ namespace CPanel
                 Console.WriteLine("### CONNECTING SUCESSFUL ###");
             }
         }
-        private async Task StartSubscribe()
-        {
-            var parametersList = _mqttServerClient.GetParameters();
-            var topicList = new List<string>();
-            foreach (var parameter in parametersList)
-            {
-                topicList.Add(parameter.Topic);
-            }
-            await _mqttServerClient.Subscribe(topicList);
-        }
         private async Task ReconnectHendler()
         {
             _mqttServerClient.Client.UseDisconnectedHandler(async e =>

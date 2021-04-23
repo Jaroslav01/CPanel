@@ -20,6 +20,7 @@
   background-size: cover;
   align-items: end;
   justify-content: center;
+  display: inline-block;
 }
 
 .example-large-box {
@@ -51,4 +52,18 @@
 .lamp_btn_text{
     color:white;
     position:fixed;
+}
+
+.mar {
+  max-width: 48%;
+  display: block;
+  margin: 3%;
+}
+.example-selected-value {
+  margin: 15px 0;
+}
+#button-toggle-group {
+  border-radius: 4px!important;
+  margin-left: auto!important;
+  margin-right: auto!important;
 }

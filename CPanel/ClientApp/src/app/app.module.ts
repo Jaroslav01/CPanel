@@ -27,6 +27,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 import * as signalR from "@microsoft/signalr";
 import { LoginComponent } from './login/login.component';
@@ -64,6 +66,8 @@ import { AccountComponent } from './account/account.component';
     MatFormFieldModule,
     MatBadgeModule,
     MatTabsModule,
+    MatStepperModule,
+    MatButtonToggleModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },

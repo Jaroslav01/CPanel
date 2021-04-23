@@ -38,46 +38,60 @@ export class HomeComponent implements OnInit {
   }
   ngOnInit() {
     this.start();
-    this.connection.on("devices", (
+    this.connection.on("DevicesGet", (
       action: string,
-      id: number,
-      userId: number,
-      uptime: number,
-      rssi: number,
-      name: string,
-      topic: string,
-      ip: string,
-      mac: string,
-      freeMem: number,
-      parameters: Parameter[]
+      devices: Devices
     ) => {
-      var item: Devices;
-      console.log(action)
+      console.log(devices);
+      console.log(action);
       if (action == "update") {
         for (var i = 0; i < this.response.length; i++) {
-          if (this.response[i]["id"] == id) {
-            this.response[i]["userId"] = userId;
-            this.response[i]["uptime"] = uptime;
-            this.response[i]["rssi"] = rssi;
-            this.response[i]["name"] = name;
-            this.response[i]["topic"] = topic;
-            this.response[i]["ip"] = ip;
-            this.response[i]["mac"] = mac;
-            this.response[i]["freeMem"] = freeMem;
-            this.response[i]["parameters"] = parameters;
+          if (this.response[i]["id"] == devices.id) {
+            this.response[i] = devices;
           }
         }
       }
 
       else if (action == "add") {
-        var item: Devices;
-        item = { id, userId, uptime, rssi, name, topic, ip, mac, freeMem, parameters};
-        this.response.push(item);
+        this.response.push(devices);
       }
       else if (action == "delete") {
         for (var i = 0; i < this.response.length; i++) {
-          if (this.response[i]["id"] == id) {
+          if (this.response[i]["id"] == devices.id) {
             this.response.splice(i, 1);
+          }
+        }
+      }
+    });
+    this.connection.on("ParametersGet", (
+      action: string,
+      parameter: Parameter
+    ) => {
+      console.log(parameter);
+      console.log(action);
+      if (action == "update") {
+        for (var i = 0; i < this.response.length; i++) {
+          for (var j = 0; j < this.response[i].parameters.length; j++) {
+            if (this.response[i].parameters[j]["id"] == parameter.id) {
+              this.response[i].parameters[i] = parameter;
+            }
+          }
+        }
+      }
+
+      else if (action == "add") {
+        for (var i = 0; i < this.response.length; i++) {
+          if (this.response[i].id == parameter.deviseId) {
+            this.response[i].parameters.push(parameter);
+          }
+        }
+      }
+      else if (action == "delete") {
+        for (var i = 0; i < this.response.length; i++) {
+          for (var j = 0; j < this.response[i].parameters.length; j++) {
+            if (this.response[i].parameters[j]["id"] == parameter.id) {
+              this.response[i].parameters.splice(j, 1);
+            }
           }
         }
       }
@@ -168,20 +182,46 @@ interface Parameter {
   templateUrl: 'dialog-data-example-dialog.html',
 })
 export class DialogElementsExampleDialog {
-  constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string, private _snackBar: MatSnackBar) { }
+  public response: Devices[];
+
+  constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string, private _snackBar: MatSnackBar, public localStorag: LocalStorageService) {
+    http.post<Devices[]>(baseUrl + 'mqtt/GetDevices', {}, this.httpOptions()).subscribe((result) => {
+      this.response = result;
+      console.log(result);
+    });
+  }
   type: string;
+  deviceId: string;
+  public AddDevice() {
+    var topic = <HTMLInputElement>document.getElementById("topicDevice");
+    var name = <HTMLInputElement>document.getElementById("nameDevice");
+    this.http.post<any[]>(this.baseUrl + "mqtt/AddDevices?topic=" + topic.value + "&name=" + name.value, {}, this.httpOptions()).subscribe((result) => {
+      this.response = result;
+      console.log(result);
+    });
+    this.openSnackBar("Saccesfull add " + name.value, "Hide");
+  }
   public Add() {
     var topic = <HTMLInputElement>document.getElementById("topic");
     var name = <HTMLInputElement>document.getElementById("name");
-    this.http.get<any>(this.baseUrl + "mqtt/AddParameter?topic=" + topic.value + "&type" + this.type + "&name=" + name.value).toPromise()
-      .then(function (response) {
-        return response.text();
-      });
+    this.http.post<any[]>(this.baseUrl + "mqtt/AddParameter?topic=" + topic.value + "&type" + this.type + "&name=" + name.value + "&deviceId=" + this.deviceId, {}, this.httpOptions()).subscribe((result) => {
+      this.response = result;
+      console.log(result);
+    });
     this.openSnackBar("Saccesfull add " + name.value, "Hide");
   }
   public openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
       duration: 1000,
     });
+  }
+  public httpOptions() {
+    var headers_object = new HttpHeaders().set("Authorization", "Bearer " + this.localStorag.get("access_token"));
+    headers_object.append('Content-Type', 'application/json');
+    headers_object.append("Authorization", "Bearer " + this.localStorag.get("access_token"));
+    const httpOptions = {
+      headers: headers_object
+    };
+    return httpOptions;
   }
 }
