@@ -34,3 +34,24 @@ input.example-right-align {
   margin-right: auto;
   display:block;
 }
+.form{
+    margin-left:auto;
+    margin-right:auto;
+    max-width:50%;
+}
+@media (min-width: 575px) and (max-width: 1000px) {
+  .form {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 70%;
+  }
+}
+
+@media (max-width: 575px) {
+
+  .form {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+  }
+}
