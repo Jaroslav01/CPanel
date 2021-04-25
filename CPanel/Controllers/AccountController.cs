@@ -66,7 +66,7 @@ namespace CPanel.Controllers
             // если пользователя не найдено
             return null;
         }
-        [HttpPost("Register")]
+        [HttpGet("Register")]
         public IActionResult Register(string login, string password, string firstName, string lastName)
         {
             using var _db = new PeopleContext();

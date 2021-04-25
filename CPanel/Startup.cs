@@ -38,6 +38,7 @@ namespace CPanel
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddScoped<DbContext, DbContext>();
             services.AddSignalR();
             services.AddSingleton<MqttServerClient, MqttServerClient>();
             services.AddSingleton<SignalRClient, SignalRClient>();

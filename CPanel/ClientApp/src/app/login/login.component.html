@@ -1,3 +1,4 @@
+<!--
 <mat-card class="loginRegister">
   <h1>Login</h1>
   <mat-form-field appearance="fill">
@@ -37,3 +38,43 @@
   </mat-form-field>
   <button (click)="Register()" class="login_btn" mat-raised-button>Register</button>
 </mat-card>
+  -->
+<mat-tab-group mat-align-tabs="center">
+  <mat-tab label="Login">
+    <mat-vertical-stepper>
+      <mat-step [stepControl]="secondFormGroup" label="Email">
+        <mat-form-field appearance="fill">
+          <mat-label>Enter your email</mat-label>
+          <input id="loginemail" matInput placeholder="pat@example.com">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Enter your password</mat-label>
+          <input id="loginpassword" matInput [type]="hide ? 'password' : 'text'">
+          <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+            <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
+        <button (click)="Login()" class="login_btn" mat-raised-button>Login</button>
+      </mat-step>
+      
+    </mat-vertical-stepper>
+  </mat-tab>
+  <mat-tab label="Register">
+    <mat-vertical-stepper>
+      <mat-step [stepControl]="secondFormGroup" label="Name">
+        <mat-form-field appearance="fill">
+          <mat-label>Enter your email</mat-label>
+          <input id="loginemail" matInput placeholder="pat@example.com">
+        </mat-form-field>
+      </mat-step>
+      <mat-step [stepControl]="secondFormGroup" label="Email">
+        <mat-form-field appearance="fill">
+          <mat-label>Enter your email</mat-label>
+          <input id="loginemail" matInput placeholder="pat@example.com">
+        </mat-form-field>
+      </mat-step>
+      <mat-step [stepControl]="secondFormGroup" label="Password">
+      </mat-step>
+    </mat-vertical-stepper>
+  </mat-tab>
+</mat-tab-group>

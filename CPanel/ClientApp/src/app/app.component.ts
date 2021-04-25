@@ -6,14 +6,17 @@ import { LocalStorageService } from './local-storage.service';
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
   constructor(public localStorag: LocalStorageService) {
 
   }
   title = 'app';
   username = "Guest";
   ngOnInit() {
-    this.username = this.localStorag.get("username");
+    console.log(this.username = this.localStorag.get("username"));
+    if (this.localStorag.get("username") != null) {
+      this.username = this.localStorag.get("username");
+    }
   }
   UpdateUserTitle() {
     this.username = this.localStorag.get("username");

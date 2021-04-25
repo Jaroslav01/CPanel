@@ -1,13 +1,14 @@
 <mat-card dynamicHeight *ngFor="let responses of response" style=" margin-bottom: 3%;">
 
   <mat-card-title>{{responses.name}}</mat-card-title>
-    <mat-tab-group dynamicHeight mat-align-tabs="center">
+    <mat-tab-group dynamicHeight mat-align-tabs="center" >
       <mat-tab label="Control">
         <button *ngFor="let parameter of responses.parameters" class="example-small-box mat-elevation-z4" (click)="OnOff(parameter.topic, parameter.data, parameter.type)">
           <img *ngIf="parameter.data == '1'" class="lamp_img" src="{{baseUrl}}images/LampOn2.jpg" alt="Alternate Text" />
           <img *ngIf="parameter.data == '0'" class="lamp_img" src="{{baseUrl}}images/LampOff2.jpg" alt="Alternate Text" />
           <div class="lamp_btn_text">
             {{parameter.name}}
+
           </div>
         </button>
       </mat-tab>
