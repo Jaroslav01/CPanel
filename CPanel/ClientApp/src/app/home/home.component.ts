@@ -31,10 +31,11 @@ export class HomeComponent implements OnInit {
   public response: Devices[];
   public res: Devices[];
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string, public dialog: MatDialog, private _snackBar: MatSnackBar, public localStorag: LocalStorageService, public appComponent: AppComponent) {
-    http.post<Devices[]>(baseUrl + 'mqtt/GetDevices', {}, this.httpOptions()).subscribe((result) => {
+    http.post<Devices[]>(baseUrl + 'mqtt/GetDevices', {}).subscribe((result) => {
       this.response = result;
       console.log(result);
-    });
+    },
+      err => console.log(err.status));
   }
   ngOnInit() {
     this.start();
@@ -109,15 +110,6 @@ export class HomeComponent implements OnInit {
       }
     });
   }
-  public httpOptions() {
-    var headers_object = new HttpHeaders().set("Authorization", "Bearer " + this.localStorag.get("access_token"));
-    headers_object.append('Content-Type', 'application/json');
-    headers_object.append("Authorization", "Bearer " + this.localStorag.get("access_token"));
-    const httpOptions = {
-      headers: headers_object
-    };
-    return httpOptions;
-  }
   public async start() {
     try {
       this.connection.start();
@@ -155,7 +147,7 @@ export class HomeComponent implements OnInit {
       }
     }
     console.log(value);
-    this.http.post<any>(this.baseUrl + "mqtt/set?topic=" + topic + "&value=" + value, {}, this.httpOptions()).subscribe((result) => {
+    this.http.post<any>(this.baseUrl + "mqtt/set?topic=" + topic + "&value=" + value, {}).subscribe((result) => {
       console.log(result);
     });
     this.openSnackBar("Updated", "Hide");
@@ -163,14 +155,14 @@ export class HomeComponent implements OnInit {
   type: string;
   public Update(id: string) {
     var name = <HTMLInputElement>document.getElementById(id + "name");
-    this.http.post<any>(this.baseUrl + "mqtt/UpdateParameter?id=" + id + "&name=" + name.value + "&type=" + this.type, {}, this.httpOptions()).subscribe((result) => {
+    this.http.post<any>(this.baseUrl + "mqtt/UpdateParameter?id=" + id + "&name=" + name.value + "&type=" + this.type, {}).subscribe((result) => {
       console.log(result);
       this.openSnackBar("Updated", "Hide");
     });
   }
   public Delete(id: string) {
     var name = <HTMLInputElement>document.getElementById(id + "name");
-    this.http.post<any>(this.baseUrl + "mqtt/Delete?id=" + id, {}, this.httpOptions()).subscribe((result) => {
+    this.http.post<any>(this.baseUrl + "mqtt/Delete?id=" + id, {}).subscribe((result) => {
       console.log(result);
       this.openSnackBar("Deleted", "Hide");
     });
@@ -205,7 +197,7 @@ interface Parameter {
 export class DialogElementsExampleDialog {
   public response: Devices[];
   constructor(public http: HttpClient, @Inject('BASE_URL') public baseUrl: string, private _snackBar: MatSnackBar, public localStorag: LocalStorageService) {
-    http.post<Devices[]>(baseUrl + 'mqtt/GetDevices', {}, this.httpOptions()).subscribe((result) => {
+    http.post<Devices[]>(baseUrl + 'mqtt/GetDevices', {}).subscribe((result) => {
       this.response = result;
       console.log(result);
     });
@@ -215,7 +207,7 @@ export class DialogElementsExampleDialog {
   public AddDevice() {
     var topic = <HTMLInputElement>document.getElementById("topicDevice");
     var name = <HTMLInputElement>document.getElementById("nameDevice");
-    this.http.post<any[]>(this.baseUrl + "mqtt/AddDevices?topic=" + topic.value + "&name=" + name.value, {}, this.httpOptions()).subscribe((result) => {
+    this.http.post<any[]>(this.baseUrl + "mqtt/AddDevices?topic=" + topic.value + "&name=" + name.value, {}).subscribe((result) => {
       this.response = result;
       console.log(result);
     });
@@ -224,7 +216,7 @@ export class DialogElementsExampleDialog {
   public Add(type: string) {
     var topic = <HTMLInputElement>document.getElementById("topic");
     var name = <HTMLInputElement>document.getElementById("name");
-    this.http.post<any[]>(this.baseUrl + "mqtt/AddParameter?topic=" + topic.value + "&type" + type + "&name=" + name.value + "&deviceId=" + this.deviceId, {}, this.httpOptions()).subscribe((result) => {
+    this.http.post<any[]>(this.baseUrl + "mqtt/AddParameter?topic=" + topic.value + "&type" + type + "&name=" + name.value + "&deviceId=" + this.deviceId, {}).subscribe((result) => {
       this.response = result;
       console.log(result);
     });
@@ -235,13 +227,5 @@ export class DialogElementsExampleDialog {
       duration: 1000,
     });
   }
-  public httpOptions() {
-    var headers_object = new HttpHeaders().set("Authorization", "Bearer " + this.localStorag.get("access_token"));
-    headers_object.append('Content-Type', 'application/json');
-    headers_object.append("Authorization", "Bearer " + this.localStorag.get("access_token"));
-    const httpOptions = {
-      headers: headers_object
-    };
-    return httpOptions;
-  }
+
 }

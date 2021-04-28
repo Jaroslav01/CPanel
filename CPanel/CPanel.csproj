@@ -63,6 +63,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Remove="ClientApp\src\app\auth\token.interceptor.ts" />
     <TypeScriptCompile Remove="ClientApp\src\app\panel\panel.component.spec.ts" />
   </ItemGroup>
 

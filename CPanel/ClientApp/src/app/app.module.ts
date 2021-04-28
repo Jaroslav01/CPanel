@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { HttpClientModule} from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -33,6 +33,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import * as signalR from "@microsoft/signalr";
 import { LoginComponent } from './login/login.component';
 import { AccountComponent } from './account/account.component';
+import { TokenInterceptor } from './auth/token.interceptor';
 
 
 @NgModule({
@@ -80,7 +81,10 @@ import { AccountComponent } from './account/account.component';
   entryComponents: [HomeComponent, DialogElementsExampleDialog],
 
 
-  providers: [],
+  providers: [{
+    provide: HTTP_INTERCEPTORS,
+    useClass: TokenInterceptor,
+    multi: true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
