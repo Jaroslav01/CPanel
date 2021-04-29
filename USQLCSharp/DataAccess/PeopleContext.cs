@@ -21,7 +21,11 @@ namespace USQLCSharp.DataAccess
             optionsBuilder.UseMySql("server=176.36.127.144;user=CPanel;password=220977qQ;database=CPanel",
                     mysqlOptions =>
                     {
-                        mysqlOptions.ServerVersion(new Version(10, 3, 27), ServerType.MySql);
+                        mysqlOptions.ServerVersion(new Version(10, 3, 27), ServerType.MySql)
+                        .EnableRetryOnFailure(
+                            maxRetryCount: 10,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null);
                     });
         }
     }

@@ -204,41 +204,9 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="DataAccess\PeopleContext.cs" />
-    <Compile Include="Migrations\20210118074212_FirstMigration.cs" />
-    <Compile Include="Migrations\20210118074212_FirstMigration.designer.cs">
-      <DependentUpon>20210118074212_FirstMigration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20210124000922_Device.cs" />
-    <Compile Include="Migrations\20210124000922_Device.designer.cs">
-      <DependentUpon>20210124000922_Device.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20210124220608_DeviceRefactored.cs" />
-    <Compile Include="Migrations\20210124220608_DeviceRefactored.designer.cs">
-      <DependentUpon>20210124220608_DeviceRefactored.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20210129202151_Devise.cs" />
-    <Compile Include="Migrations\20210129202151_Devise.designer.cs">
-      <DependentUpon>20210129202151_Devise.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20210302114448_addType.cs" />
-    <Compile Include="Migrations\20210302114448_addType.designer.cs">
-      <DependentUpon>20210302114448_addType.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20210419191448_Person.cs" />
-    <Compile Include="Migrations\20210419191448_Person.designer.cs">
-      <DependentUpon>20210419191448_Person.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20210420195507_user.cs" />
-    <Compile Include="Migrations\20210420195507_user.designer.cs">
-      <DependentUpon>20210420195507_user.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20210421074347_devices.cs" />
-    <Compile Include="Migrations\20210421074347_devices.designer.cs">
-      <DependentUpon>20210421074347_devices.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20210429081617_mar.cs" />
-    <Compile Include="Migrations\20210429081617_mar.designer.cs">
-      <DependentUpon>20210429081617_mar.cs</DependentUpon>
+    <Compile Include="Migrations\20210429083520_mar.cs" />
+    <Compile Include="Migrations\20210429083520_mar.designer.cs">
+      <DependentUpon>20210429083520_mar.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\PeopleContextModelSnapshot.cs" />
     <Compile Include="Models\Contact.cs" />
