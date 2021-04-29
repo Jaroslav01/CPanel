@@ -13,7 +13,7 @@ namespace CPanel.Hubs
     public class ChatHub : Hub
     {
         public HubConnection connection { get; set; } = new HubConnectionBuilder()
-                    .WithUrl("https://localhost:5001/Hub")
+                    .WithUrl("https://176.36.127.144:5001/Hub")
                     .WithAutomaticReconnect()
                    .Build();
         public async Task NewMessage(long username, string message)

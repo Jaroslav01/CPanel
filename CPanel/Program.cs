@@ -18,6 +18,11 @@ namespace CPanel
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseUrls("https://*:5001")
+                    .UseKestrel(options =>
+                    {
+                        options.Limits.MaxRequestBodySize = null;
+                    });
                 });
     }
 }
