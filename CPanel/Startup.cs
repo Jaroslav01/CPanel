@@ -15,6 +15,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using IdentityServer4.Models;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Pomelo.EntityFrameworkCore.MySql;
+using Pomelo.EntityFrameworkCore;
+using System;
 
 namespace CPanel
 {
@@ -34,10 +38,19 @@ namespace CPanel
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            // Replace with your connection string.
+            var connectionString = "server=localhost;user=root;password=1234;database=ef";
+
+            // Replace with your server version and type.
+            // Use 'MariaDbServerVersion' for MariaDB.
+            // Alternatively, use 'ServerVersion.AutoDetect(connectionString)'.
+            // For common usages, see pull request #1233.
+            services.AddDbContext<PeopleContext>();
+            /*
             services.AddDbContext<PeopleContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-            });
+            });*/
             services.AddScoped<DbContext, DbContext>();
             services.AddSignalR();
             services.AddSingleton<MqttServerClient, MqttServerClient>();
