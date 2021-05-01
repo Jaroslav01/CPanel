@@ -38,8 +38,6 @@ namespace CPanel
                 configuration.RootPath = "ClientApp/dist";
             });
             // Replace with your connection string.
-            var connectionString = "server=localhost;user=root;password=1234;database=ef";
-
             // Replace with your server version and type.
             // Use 'MariaDbServerVersion' for MariaDB.
             // Alternatively, use 'ServerVersion.AutoDetect(connectionString)'.
