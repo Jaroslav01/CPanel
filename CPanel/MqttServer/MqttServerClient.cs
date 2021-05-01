@@ -1,9 +1,10 @@
-﻿using MQTTnet;
+﻿using CPanel.SignalR;
+using Microsoft.AspNetCore.SignalR.Client;
+using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Options;
 using MQTTnet.Client.Subscribing;
-using MQTTnet.Formatter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,6 @@ using System.Text;
 using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
-using Microsoft.AspNetCore.SignalR.Client;
-using CPanel.SignalR;
 
 namespace CPanel.MqttServer
 {

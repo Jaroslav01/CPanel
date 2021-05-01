@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using USQLCSharp.Models;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System;
+using USQLCSharp.Models;
 
 namespace USQLCSharp.DataAccess
 {

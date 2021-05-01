@@ -1,24 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MQTTnet;
-using MQTTnet.Client;
-using MQTTnet.Client.Connecting;
-using MQTTnet.Client.Options;
-using MQTTnet.Client.Subscribing;
-using MQTTnet.Formatter;
-using System;
+﻿using CPanel.MqttServer;
+using CPanel.SignalR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
-using CPanel.Hubs;
-using Microsoft.AspNetCore.SignalR.Client;
-using System.Threading;
-using CPanel.MqttServer;
-using CPanel.SignalR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Configuration;
 
 namespace CPanel.Controllers
 {

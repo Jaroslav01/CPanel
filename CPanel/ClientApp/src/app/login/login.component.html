@@ -43,7 +43,7 @@
   <mat-tab-group mat-align-tabs="center">
     <mat-tab label="Login">
       <mat-vertical-stepper>
-        <mat-step [stepControl]="secondFormGroup" label="Auth">
+        <mat-step label="Auth">
           <mat-form-field appearance="fill">
             <mat-label><mat-icon>email</mat-icon></mat-label>
             <input id="loginemail" matInput placeholder="pat@example.com">
@@ -62,7 +62,7 @@
     </mat-tab>
     <mat-tab label="Register">
       <mat-vertical-stepper>
-        <mat-step [stepControl]="secondFormGroup" label="Name">
+        <mat-step label="Name">
           <mat-form-field appearance="fill">
             <mat-label>First name</mat-label>
             <input id="firstname" matInput placeholder="Yaroslav">
@@ -72,13 +72,13 @@
             <input id="lastname" matInput placeholder="Yushchenko">
           </mat-form-field>
         </mat-step>
-        <mat-step [stepControl]="secondFormGroup" label="Email">
+        <mat-step label="Email">
           <mat-form-field appearance="fill">
             <mat-label><mat-icon>email</mat-icon></mat-label>
             <input id="registeremail" matInput placeholder="yaroslav.y@gmail.com">
           </mat-form-field>
         </mat-step>
-        <mat-step [stepControl]="secondFormGroup" label="Password">
+        <mat-step label="Password">
           <mat-form-field appearance="fill">
             <mat-label><mat-icon>password</mat-icon></mat-label>
             <input id="registerpassword" matInput [type]="hide ? 'password' : 'text'">

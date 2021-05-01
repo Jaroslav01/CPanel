@@ -1,6 +1,4 @@
 ﻿using CPanel.MqttServer;
-using CPanel.ViewModels;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -8,7 +6,6 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using USQLCSharp.DataAccess;
 using USQLCSharp.Models;
 
@@ -71,7 +68,7 @@ namespace CPanel.Controllers
         {
             using var _db = new PeopleContext();
             var persons = _db.Person.FirstOrDefault(x => x.Login == login);
-            if(persons != null) return BadRequest(new { errorText = "Email already registered" });
+            if (persons != null) return BadRequest(new { errorText = "Email already registered" });
             var user = new Person
             {
                 Login = login,
@@ -86,4 +83,3 @@ namespace CPanel.Controllers
         }
     }
 }
-    
