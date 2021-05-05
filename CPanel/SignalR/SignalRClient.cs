@@ -6,7 +6,7 @@ namespace CPanel.SignalR
     public class SignalRClient
     {
         public readonly HubConnection connection = new HubConnectionBuilder()
-                      .WithUrl("https://localhost:5001/Hub")
+                      .WithUrl("https://y-cpanel.xyz/Hub")
                       .WithAutomaticReconnect()
                      .Build();
         public async Task Start()

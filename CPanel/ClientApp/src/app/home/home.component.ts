@@ -138,14 +138,6 @@ export class HomeComponent implements OnInit {
     console.log(type);
     console.log(topic);
 
-    if (type == "button") {
-      if (value == "0") {
-        value = "1";
-      }
-      else {
-        value = "0";
-      }
-    }
     console.log(value);
     this.http.post<any>(this.baseUrl + "mqtt/set?topic=" + topic + "&value=" + value, {}).subscribe((result) => {
       console.log(result);

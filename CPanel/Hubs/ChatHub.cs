@@ -8,14 +8,9 @@ namespace CPanel.Hubs
 {
     public class ChatHub : Hub
     {
-        public HubConnection connection { get; set; } = new HubConnectionBuilder()
-                    .WithUrl("http://176.36.127.144/Hub")
-                    .WithAutomaticReconnect()
-                   .Build();
         public async Task NewMessage(long username, string message)
         {
             await Clients.All.SendAsync("messageReceived", username, message);
-
         }
         public async Task Update(long id, string name)
         {

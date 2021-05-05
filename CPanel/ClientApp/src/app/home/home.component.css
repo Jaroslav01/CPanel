@@ -33,7 +33,7 @@
 }
 
 .example-header-image {
-  background-image: url('http://domoticx.com/wp-content/uploads/2015/12/Espressif-logo.png');
+  background-image: url(https://y-cpanel.xyz/images/Espressif-logo.png);
   background-size: cover;
 }
 .rssi {

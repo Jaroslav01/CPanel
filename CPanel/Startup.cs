@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System.Net;
 using USQLCSharp.DataAccess;
 
 namespace CPanel
@@ -27,6 +28,11 @@ namespace CPanel
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = (int)HttpStatusCode.PermanentRedirect;
+                options.HttpsPort = 443;
+            });
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders =
@@ -37,22 +43,12 @@ namespace CPanel
             {
                 configuration.RootPath = "ClientApp/dist";
             });
-            // Replace with your connection string.
-            // Replace with your server version and type.
-            // Use 'MariaDbServerVersion' for MariaDB.
-            // Alternatively, use 'ServerVersion.AutoDetect(connectionString)'.
-            // For common usages, see pull request #1233.
+
             services.AddDbContext<PeopleContext>();
-            /*
-            services.AddDbContext<PeopleContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-            });*/
             services.AddScoped<DbContext, DbContext>();
             services.AddSignalR();
             services.AddSingleton<MqttServerClient, MqttServerClient>();
             services.AddSingleton<SignalRClient, SignalRClient>();
-            //services.AddHostedService<BackgroundService>();
             services.AddHostedService<MyServiceA>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
@@ -64,14 +60,12 @@ namespace CPanel
                             ValidateIssuer = true,
                             // строка, представляющая издателя
                             ValidIssuer = AuthOptions.ISSUER,
-
                             // будет ли валидироваться потребитель токена
                             ValidateAudience = true,
                             // установка потребителя токена
                             ValidAudience = AuthOptions.AUDIENCE,
                             // будет ли валидироваться время существования
                             ValidateLifetime = true,
-
                             // установка ключа безопасности
                             IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
                             // валидация ключа безопасности
@@ -79,7 +73,6 @@ namespace CPanel
                         };
                     });
         }
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             var mqttServerClient = app.ApplicationServices.GetService<MqttServerClient>();
@@ -91,6 +84,7 @@ namespace CPanel
             }
             else
             {
+                
                 app.UseExceptionHandler("/Error");
                 app.UseForwardedHeaders();
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
