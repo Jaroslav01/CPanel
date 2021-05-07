@@ -75,3 +75,122 @@
   margin-left: auto!important;
   margin-right: auto!important;
 }
+.mat-form-field + .mat-form-field {
+  margin-left: 8px;
+}
+.example-headers-align .mat-expansion-panel-header-title,
+.example-headers-align .mat-expansion-panel-header-description {
+  flex-basis: 0;
+}
+
+.example-headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.example-headers-align .mat-form-field + .mat-form-field {
+  margin-left: 8px;
+}
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}
+.controlbox{
+    width: 35%;
+    margin: 3%;
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    height: 65px;
+    position: relative;
+    display: inline-block;
+    background-color: white;
+    box-shadow: 0 1px 2px 0px black;
+    border-radius: 4px;
+}
+mat-slider {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative!important;
+}
+.nameTag{
+  max-width: 100%;
+  max-height: 30px;
+  padding: 1%;
+  text-align: center;
+  background-color: #000000a1;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  color: white;
+  margin-top: 1%;
+}
+.btnControl{
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+}
+.pictureControl{
+  height: 73px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+.controlBox{
+  width: 30%;
+  height: 75px;
+}
+.mat-sliderr{
+  width: 65%;
+}
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+  .controlBox{
+    width: 39%;
+    height: 150px;
+  }
+  .pictureControl{
+    height: 100%;
+    width: 100%;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+  .mat-slider-horizontal{
+    width: 65%;
+  }
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media (max-width: 768px) and (min-width: 600px) {
+  .controlBox{
+    width: 39%;
+    height: 150px;
+  }
+  .pictureControl{
+    height: 100%;
+    width: 100%;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+  .mat-sliderr{
+    width: 65%;
+  }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media (max-width: 992px) and (min-width: 768px) {
+
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media (max-width: 1200px) and  (min-width: 992px) {
+
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media (min-width: 1200px) {
+
+}

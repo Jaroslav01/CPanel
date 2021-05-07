@@ -29,6 +29,9 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatAutocompleteModule}  from '@angular/material/autocomplete';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import * as signalR from "@microsoft/signalr";
 import { LoginComponent } from './login/login.component';
@@ -46,7 +49,6 @@ import { TokenInterceptor } from './auth/token.interceptor';
     CounterComponent,
     LoginComponent,
     AccountComponent,
-
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -69,6 +71,9 @@ import { TokenInterceptor } from './auth/token.interceptor';
     MatTabsModule,
     MatStepperModule,
     MatButtonToggleModule,
+    MatExpansionModule,
+    MatAutocompleteModule,
+    MatProgressBarModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },

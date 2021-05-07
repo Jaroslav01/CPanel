@@ -132,12 +132,13 @@ namespace CPanel.Controllers
         }
         [Authorize(Roles = "user")]
         [HttpPost("UpdateDevices")]
-        public async Task<IActionResult> UpdateDevices(int id, string name)
+        public async Task<IActionResult> UpdateDevices(int id, string name, string topic)
         {
             using var db = new PeopleContext();
             var user = db.Person.FirstOrDefault(x => x.Login == User.Identity.Name);
             var device = db.Devices.FirstOrDefault(x => x.Id == id && x.UserId == user.Id);
             device.Name = name;
+            device.Topic = topic;
             await db.SaveChangesAsync();
             var topicList = new List<string>();
             string[] topics =
@@ -150,6 +151,23 @@ namespace CPanel.Controllers
             };
             await _mqttServerClient.Subscribe(topicList);
             await _signalRClient.connection.SendAsync("Devices", "update", device);
+            return Ok();
+        }
+        [Authorize(Roles = "user")]
+        [HttpPost("DeleteDeviceWithParameters")]
+        public async Task<IActionResult> DeleteDeviceWithParameters(int id)
+        {
+            using var db = new PeopleContext();
+            var user = db.Person.FirstOrDefault(x => x.Login == User.Identity.Name);
+            var devicesForDeleting = db.Devices.Where(x => x.Id == id && x.UserId == user.Id);
+            foreach (var device in devicesForDeleting)
+            {
+                await Delete(device.Id);
+                db.Devices.Remove(device);
+                await _mqttServerClient.Unsubscribe(device.Topic);
+                await _signalRClient.connection.SendAsync("Parameters", "delete", device);
+            }
+            db.SaveChanges();
             return Ok();
         }
     }

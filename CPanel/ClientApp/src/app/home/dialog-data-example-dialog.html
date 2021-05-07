@@ -4,28 +4,25 @@
       <form class="example-form" style=" display: grid;">
         <mat-form-field class="example-full-width mar">
           <mat-label>Name</mat-label>
-          <input matInput id="name" placeholder="Name" value="">
+          <input #addName matInput id="name" placeholder="Name" value="">
         </mat-form-field>
         <mat-form-field class="example-full-width mar">
           <mat-label>Topic</mat-label>
-          <input matInput id="topic" placeholder="topic/" value="">
-        </mat-form-field>
+          <input #addTopic matInput id="topic" placeholder="topic/" value="">
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let respons of response" [value]="respons.topic">
+              {{option}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field> 
       </form>
-      <mat-form-field appearance="fill" class="mar" style="border-radius: 4px !important; margin-left: auto !important; margin-right: auto !important; width: 100%;">
+      <mat-form-field #addDeviceId appearance="fill" class="mar" style="border-radius: 4px !important; margin-left: auto !important; margin-right: auto !important; width: 100%;">
         <mat-label>Select device</mat-label>
-        <mat-select [(value)]="deviceId">
-          <mat-option *ngFor="let device of response" value="{{device.id}}">{{device.id}}:{{device.name}}</mat-option>
+        <mat-select>
+          <mat-option  *ngFor="let device of response" value="{{device.id}}">{{device.id}}:{{device.name}}</mat-option>
         </mat-select>
       </mat-form-field>
-      <!--
-  <mat-form-field appearance="fill" class="mar">
-    <mat-label>Select control type</mat-label>
-    <mat-select [(value)]="type">
-      <mat-option value="button">Button</mat-option>
-      <mat-option value="slider">Slider</mat-option>
-    </mat-select>
-      </mat-form-field>-->
-      <mat-button-toggle-group style="border-radius: 4px !important; margin-left: auto !important; margin-right: auto !important; width: 100%; display:inline-block;" #group="matButtonToggleGroup">
+      <mat-button-toggle-group #addtype="matButtonToggleGroup" style="border-radius: 4px !important; margin-left: auto !important; margin-right: auto !important; width: 100%; display:inline-block;">
         <mat-button-toggle value="button" aria-label="Text align left" style=" width: 50%; display:inline-block;">
           <mat-icon><mat-icon>toggle_on</mat-icon></mat-icon>
         </mat-button-toggle>
@@ -36,7 +33,7 @@
       <!--      <div class="example-selected-value">Selected value: {{group.value}}</div>-->
       <div mat-dialog-actions>
         <button mat-button mat-dialog-close>Close</button>
-        <button mat-button (click)="Add(group.value)">Save</button>
+        <button mat-button (click)="Add(addName.value, addTopic.value, addtype.value, addDeviceId.value)">Save</button>
       </div>
     </div>
   </mat-tab>
@@ -45,16 +42,16 @@
       <form class="example-form" style=" display: grid;">
         <mat-form-field class="example-full-width mar">
           <mat-label>Name</mat-label>
-          <input matInput id="nameDevice" placeholder="Name" value="">
+          <input #addDeviceName matInput id="nameDevice" placeholder="Name" value="">
         </mat-form-field>
         <mat-form-field class="example-full-width mar">
           <mat-label>Topic</mat-label>
-          <input matInput id="topicDevice" placeholder="topic/" value="">
+          <input #addDeviceTopic matInput id="topicDevice" placeholder="topic/" value="">
         </mat-form-field>
       </form>
       <div mat-dialog-actions>
         <button mat-button mat-dialog-close>Close</button>
-        <button mat-button (click)="AddDevice()">Save</button>
+        <button mat-button (click)="AddDevice(addDeviceName.value, addDeviceTopic.value )">Save</button>
       </div>
     </div>
   </mat-tab>

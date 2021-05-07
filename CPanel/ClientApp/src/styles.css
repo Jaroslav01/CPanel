@@ -3,6 +3,10 @@ html, body { height: 100%; }
 body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
+    background-color: tomato;
+    background-image: url(https://y-cpanel.xyz/images/Background2.png);
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 button:active, button:focus {
   outline: none;
@@ -50,4 +54,14 @@ button::-moz-focus-inner {
 .card-title {
   margin-bottom: .75rem;
   text-align: -webkit-center;
+}
+.preloader{
+  width: 50%;
+  height: 10%;
+  margin-top: 20%;
+  margin-left: 25%;
+  background-color: white;
+  border-radius: 10px;
+  text-align: center;
+  padding: 1.7%;
 }

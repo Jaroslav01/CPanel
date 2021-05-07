@@ -1,74 +1,131 @@
 <mat-card dynamicHeight *ngFor="let responses of response" style=" margin-bottom: 3%;">
-
   <mat-card-title>{{responses.name}}</mat-card-title>
     <mat-tab-group dynamicHeight mat-align-tabs="center" >
       <mat-tab label="Control">
-        <button *ngFor="let parameter of responses.parameters" class="example-small-box mat-elevation-z4" (click)="OnOff(parameter.topic, parameter.data, parameter.type)">
-          <img *ngIf="parameter.data == '1'" class="lamp_img" src="{{baseUrl}}images/LampOn2.jpg" alt="Alternate Text" />
-          <img *ngIf="parameter.data == '0'" class="lamp_img" src="{{baseUrl}}images/LampOff2.jpg" alt="Alternate Text" />
-          <div class="lamp_btn_text">
-            {{parameter.name}}
-
+        <div *ngFor="let parameter of responses.parameters" class="controlBox d-inline-block position-relative card mb-5 m-3">
+          <div class="row no-gutters">
+            <div class="col-md-4">
+              ​<picture>
+                <!--<source srcset="..." type="image/svg+xml">-->
+                <img *ngIf="parameter.data == '1'" src="{{baseUrl}}images/LampOn2.jpg" style="max-height: 75px;" class="img-fluid pictureControl" alt="...">
+                <img *ngIf="parameter.data == '0'" src="{{baseUrl}}images/LampOff2.jpg" style="max-height: 75px;" class="img-fluid pictureControl" alt="...">
+                <img *ngIf="parameter.data != '0' && parameter.data != '1'" src="{{baseUrl}}images/Offline.png" style="max-height: 75px;" class="img-fluid pictureControl" alt="...">
+              </picture>
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <button
+                  *ngIf="parameter.type == 'button'"
+                  mat-raised-button 
+                  lass="btnControl"
+                  (click)="OnOff(parameter.topic, parameter.data, parameter.type)">
+                  <div *ngIf="parameter.data == '0'">Turn On</div>
+                  <div *ngIf="parameter.data == '1'">Turn Off</div>
+                </button>
+                <mat-slider
+                  #sliderControl
+                  *ngIf="parameter.type == 'slider'"
+                  thumbLabel
+                  [displayWith]="formatLabel"
+                  tickInterval="1000"
+                  step="1"
+                  min="0"
+                  max="100"
+                  aria-label="units"
+                  class="mat-sliderr"
+                  style="margin: -6%;"
+                  (change)="OnOff(parameter.topic, sliderControl.value, parameter.type)">
+                </mat-slider>
+              </div>
+            </div>
           </div>
-        </button>
+          <div class="nameTag">
+            <h5>{{parameter.name}}</h5>
+          </div>
+        </div>
       </mat-tab>
-      <mat-tab label="Info">
-        <mat-card class="example-card">
-          <mat-card-header>
-            <div mat-card-avatar class="example-header-image"></div>
-            <mat-card-title>{{responses.name}}</mat-card-title>
-            <mat-card-subtitle>Id: {{responses.id}}</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <p>
-              IP: <a href="http://{{responses.ip}}/">{{responses.ip}}</a>
-            </p>
-            <p>
-              Mac: {{responses.mac}}
-            </p>
-            <p class="rssi">
-              <mat-icon *ngIf="responses.rssi > -60">signal_cellular_4_bar</mat-icon>
-              <mat-icon *ngIf="responses.rssi < -60">signal_cellular_connected_no_internet_4_bar</mat-icon>
-            </p>
-            <p>
-              UpTime: {{responses.uptime}}s
-            </p>
-            <p>
-              Topic: {{responses.topic}}
-            </p>
-            <p>
-              Free memory: {{responses.freeMem}}
-            </p>
-          </mat-card-content>
-          <mat-card-actions>
-            <button mat-button>LIKE</button>
-            <button mat-button>SHARE</button>
-          </mat-card-actions>
-        </mat-card>
+      <mat-tab label="Device">
+        <mat-form-field appearance="outline" class="mx-auto d-block">
+          <mat-label>Name</mat-label>
+          <input #nameDev matInput placeholder="Example name" value="{{responses.name}}">
+          <mat-icon matSuffix>badge</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="mx-auto d-block">
+          <mat-label>IP address</mat-label>
+          <input disabled matInput value="{{responses.ip}}">
+          <mat-icon matSuffix>link</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="mx-auto d-block">
+          <mat-label>Topic</mat-label>
+          <input #topicDev matInput placeholder="example/example" value="{{responses.topic}}">
+          <mat-icon matSuffix>topic</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="mx-auto d-block">
+          <mat-label>Signal level</mat-label>
+          <input disabled matInput value="{{responses.rssi}}">
+          <mat-icon matSuffix>leak_add</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="mx-auto d-block">
+          <mat-label>Mac</mat-label>
+          <input matInput disabled value="{{responses.mac}}">
+          <mat-icon matSuffix>contact_mail</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="mx-auto d-block">
+          <mat-label>Free memory</mat-label>
+          <input matInput disabled value="{{responses.freeMem}}">
+          <mat-icon matSuffix>memory</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="mx-auto d-block">
+          <mat-label>Uptime</mat-label>
+          <input matInput disabled value="{{responses.uptime}}s">
+          <mat-icon matSuffix>schedule</mat-icon>
+        </mat-form-field>
+        <mat-action-row>
+          <button mat-button color="warn" (click)="DeleteDevice(responses.id)">Delete</button>
+          <button mat-button color="primary" (click)="UpdateDevice(responses.id, nameDev.value, topicDev.value)">Save</button>
+        </mat-action-row>
       </mat-tab>
       <mat-tab label="Settings">
-        <div class="example-large-box mat-elevation-z4">
-          <mat-form-field appearance="outline">
-            <mat-label>Outline form field</mat-label>
-            <input matInput placeholder="Placeholder">
-            <mat-icon matSuffix>topic</mat-icon>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Outline form field</mat-label>
-            <input matInput placeholder="Placeholder">
-            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Outline form field</mat-label>
-            <input matInput placeholder="Placeholder">
-            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-          </mat-form-field>
-        </div>
+        <mat-accordion>
+        </mat-accordion>
+          <mat-expansion-panel  *ngFor="let parameter of responses.parameters" hideToggle>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{parameter.name}}
+              </mat-panel-title>
+              <mat-panel-description>
+                {{parameter.topic}}
+                <mat-icon>account_circle</mat-icon>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <mat-form-field appearance="outline" class="mx-auto d-block">
+              <mat-label>Name</mat-label>
+              <input #namePar matInput placeholder="Placeholder" value="{{parameter.name}}">
+              <mat-icon matSuffix>topic</mat-icon>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="mx-auto d-block">
+              <mat-label>Topic</mat-label>
+              <input #topicPar disabled matInput placeholder="Placeholder" value="{{parameter.topic}}">
+              <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+            </mat-form-field>
+            <mat-button-toggle-group #typePar="matButtonToggleGroup" value="{{parameter.type}}">
+              <mat-button-toggle value="button" aria-label="Text align left">
+                <mat-icon>toggle_on</mat-icon>
+              </mat-button-toggle>
+              <mat-button-toggle value="slider" aria-label="Text align center">
+                <mat-icon>swipe</mat-icon>
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+            <mat-action-row>
+              <button mat-button color="warn" (click)="DeleteParameter(parameter.id)">Delete</button>
+              <button mat-button color="primary" (click)="UpdateParameter(parameter.id, namePar.value, topicPar.value, typePar.value)">Save</button>
+            </mat-action-row>
+          </mat-expansion-panel>
       </mat-tab>
     </mat-tab-group>
 </mat-card>
 
-  <button mat-fab color="primary" aria-label="Example icon button with a vertical three dot icon" (click)="openDialog()" style="    background-color: #343a40; bottom: 0px;
+  <button mat-fab color="primary" aria-label="Example icon button with a vertical three dot icon" (click)="openDialog()" style="background-color: #343a40; bottom: 0px;
     right: 0px;
     position: fixed;
     margin: 2%;">

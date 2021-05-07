@@ -1,45 +1,4 @@
-<!--
-<mat-card class="loginRegister">
-  <h1>Login</h1>
-  <mat-form-field appearance="fill">
-    <mat-label>Enter your email</mat-label>
-    <input id="loginemail" matInput placeholder="pat@example.com">
-  </mat-form-field>
-  <mat-form-field appearance="fill">
-    <mat-label>Enter your password</mat-label>
-    <input id="loginpassword" matInput [type]="hide ? 'password' : 'text'">
-    <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-      <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-    </button>
-  </mat-form-field>
-  <button (click)="Login()" class="login_btn" mat-raised-button>Login</button>
-</mat-card>
-
-<mat-card class="loginRegister">
-  <h1>Register</h1>
-  <mat-form-field appearance="fill">
-    <mat-label>First name</mat-label>
-    <input id="firstname" matInput placeholder="Yaroslav">
-  </mat-form-field>
-  <mat-form-field appearance="fill">
-    <mat-label>Last name</mat-label>
-    <input id="lastname" matInput placeholder="Yushchenko">
-  </mat-form-field>
-  <mat-form-field appearance="fill">
-    <mat-label>Enter your email</mat-label>
-    <input id="registeremail" matInput placeholder="yaroslav.y@gmail.com">
-  </mat-form-field>
-  <mat-form-field appearance="fill">
-    <mat-label>Enter your password</mat-label>
-    <input id="registerpassword" matInput [type]="hide ? 'password' : 'text'">
-    <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-      <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-    </button>
-  </mat-form-field>
-  <button (click)="Register()" class="login_btn" mat-raised-button>Register</button>
-</mat-card>
-  -->
-<div class="form">
+<div class="form" style="background-color: white;">
   <mat-tab-group mat-align-tabs="center">
     <mat-tab label="Login">
       <mat-vertical-stepper>
